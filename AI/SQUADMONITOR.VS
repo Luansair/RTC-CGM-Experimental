@@ -421,12 +421,29 @@ while (true) {
 														if (setGkIn.IsEnemy(aiPlayer))
 															if (sqLeader.command == "engage")
 																bFleeCheck = true;
-											if (bFleeCheck) {
-												sqGkIn.Eval(AI_ALL, aiPlayer, own, ally, enemy, enemy_hidden);
-												if (own + ally < sqGkIn.MinNeed(aiPlayer, own, ally, enemy) / 2)
-													nFlee += 8;
-											}
-										}
+									if (bFleeCheck) {
+										sqGkIn.Eval(AI_ALL, aiPlayer, own, ally, enemy, enemy_hidden);
+										if (own + ally < sqGkIn.MinNeed(aiPlayer, own, ally, enemy) / 2)
+											nFlee += 8;
+									}
+								}
+
+								//flee from a clearly superior enemy hero when our army is still small
+								{
+									int nFleeLvlDiff, nFleeArmySize;
+									Hero enemyHero;
+									nFleeLvlDiff = AIVar(aiPlayer, AIV_HeroFleeLevelDiff);
+									nFleeArmySize = AIVar(aiPlayer, AIV_HeroFleeArmySize);
+									if (nFleeLvlDiff > 0)
+										if (sq.Size <= nFleeArmySize)
+											if (sqLeader.BestTargetInSquadSight.IsAlive)
+												if (sqLeader.BestTargetInSquadSight.AsHero().IsValid) {
+													enemyHero = sqLeader.BestTargetInSquadSight.AsHero();
+													if (enemyHero.inherentlevel - sqLeaderHero.inherentlevel >= nFleeLvlDiff)
+														if (enemyHero.army.count >= sq.Size)
+															nFlee += 8;
+												}
+								}
 
 										if (!bHeroHurt)
 											if (nFlee != 0)

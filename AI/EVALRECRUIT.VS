@@ -96,9 +96,18 @@ if (!bAssUnderFire) {
 					if (s.food < 100)
 						bFightForFood = true;
 
-	if (!bFightForFood)
-		if (sqLeader.AsHero().IsValid) {
+		if (!bFightForFood)
+			if (sqLeader.AsHero().IsValid) {
 			if (s.IsValid) {
+				//always enforce a minimum army size before sending a hero to fight (not only in strongholds)
+				{
+				int nHeroMin;
+				nHeroMin = AIVar(aiPlayer, AIV_HeroMinArmySize);
+					if (nHeroMin > 0)
+						if (sq.Size < nHeroMin)
+							if (!set.IsValid || !set.IsOwn(aiPlayer))
+								return -16;//not enough army, do not send the hero out
+				}
 				if (s.IsStronghold) {
 					int time, min;
 					time = GetTime() / 60000;

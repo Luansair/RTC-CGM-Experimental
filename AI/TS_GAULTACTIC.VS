@@ -97,6 +97,15 @@ if (hero.IsAlive) {
 	int i, attached;
 	hero.TSAdvHeroSkills(aSkills, aSkillLevels);
 	hero.SetCommand("enter", set.GetCentralBuilding());
+	//wait until the hero is actually inside the stronghold before giving control back to the AI
+	{
+		int nWaits;
+		nWaits = 0;
+		while (!hero.InHolder && nWaits < 20) {
+			Sleep(2000);
+			nWaits += 1;
+		}
+	}
 	hero.SetNoAIFlag(false);
 	olHorsemen.SetCommand("attach", hero);
 	attached = hero.army.count;
