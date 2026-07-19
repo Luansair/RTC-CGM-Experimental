@@ -7,13 +7,14 @@ int nAssUnderFire;
 nAssUnderFire = EnvReadInt(set, "AssUnderFire");//set in ES_Stronghold
 
 if (nAssUnderFire > 0 || set.gold >= 800) {
-	int aiPlayer, nArmyBuilds, nMilUnits, nType;
+	int aiPlayer, nArmyBuilds, nMilUnits, nType, nSpecTime;
 	bool bCanBuildNobles;
 
 	aiPlayer = set.player;
 
 	nArmyBuilds = EnvReadInt(set, "nArmyBuilds");//set in ES_Stronghold
 	nMilUnits = MilUnits(aiPlayer);
+	nSpecTime = EnvReadInt(set, "nSpecTime");
 
 	//decide whether to build army at all
 	if (nAssUnderFire > 0)
@@ -90,27 +91,24 @@ if (nAssUnderFire > 0 || set.gold >= 800) {
 		}
 		else
 			strTech = UTech(nType, Carthage);
+
 		if (GetCmdCost(strTech, gold, food)) {
 			set.SpentGoldOnTech(gold + food / 2);
 			set.Research(strTech);
-			EnvWriteInt(set, "nSpecTime", GetTime() + 300000 + rand(300001));
 		}
 		return;
 	}
-	else if (nType != 5) {//a unit is already specialized -> recruit it or, if 5-10 minutes have passed, stop specialization (weaker units have higher chance) and choose one in the next execution
-		if (EnvReadInt(set, "nSpecTime") <= 0)//this check is used to avoid a specialization change right after specific tactic scripts
-			EnvWriteInt(set, "nSpecTime", GetTime() + 300000 + rand(300001));
-		if (GetTime() >= EnvReadInt(set, "nSpecTime"))
-			if (nType == 0) {
+
+	else if (nType != 5) {
+		if (nSpecTime <= 0)//this check is used to avoid a specialization change right after specific tactic scripts
+			EnvWriteInt(set, "nSpecTime", GetTime() + 300000 + rand(300001));//one-time initial delay after tactics
+		if (GetTime() >= EnvReadInt(set, "nSpecTime")) {
+			
+			if(rand(3) == 0) {
 				set.Research("StopSpecialization");
 				return;
 			}
-			else if (rand(nType + 4) > 0)
-				EnvWriteInt(set, "nSpecTime", GetTime() + 300000 + rand(300001));
-			else {
-				set.Research("StopSpecialization");
-				return;
-			}
+		}
 	}
 
 	EnvWriteInt(set, "nBuildType", nType);
