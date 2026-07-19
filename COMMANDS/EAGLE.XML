@@ -1,0 +1,9 @@
+<commands>
+	<cmd name="hover" priority="3"
+		button="Actions/Hover.bmp"
+		key="h"
+		rollover="Hover">
+		<cmdtext target="" text="Click to hover around this position" />
+		<src obj="Eagle" />
+	</cmd>
+</commands>

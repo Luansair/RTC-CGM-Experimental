@@ -1,0 +1,47 @@
+<class id="Military" parent="Unit" cpp_class="CVXUnit">
+
+	<properties healthbar_type="2" />
+
+	<method sig="taunt" vs="data/subai/unit_taunt.vs" />
+	<method sig="train" vs="data/subai/unit_train.vs" onfinish="data/subai/unit_train_onfinish.vs" />
+	<method sig="ondie" vs="data/subai/military_ondie.vs" />
+
+	<!-- for outpost/tent defenders -->
+	<method sig="guard_enter" vs="data/subai/unit_guard_enter.vs" />
+	<method sig="guard_advance" vs="data/subai/unit_guard_advance.vs" />
+	<method sig="guard_patrol" vs="data/subai/unit_guard_patrol.vs" />
+	<method sig="guard_engage" vs="data/subai/unit_guard_engage.vs" />
+
+	<behavior script="data/subai/sneak_bonus_attack.vs" />
+
+	<defaultcmd target="Unit">
+		<cmd name="attack" />
+		<cmd name="attack_unit_type_exclusive" ctrl="1" />
+	</defaultcmd>
+	<defaultcmd target="Hero">
+		<cmd name="attach" />
+	</defaultcmd>
+	<defaultcmd target="ShipBattle">
+		<cmd name="boardship" />
+	</defaultcmd>
+	<defaultcmd target="Wagon">
+		<cmd name="capture" />
+	</defaultcmd>
+	<defaultcmd target="WildHorse">
+		<cmd name="capture" />
+	</defaultcmd>
+	<defaultcmd target="Building">
+		<cmd name="capture" />
+		<cmd name="attack" />
+		<cmd name="enter" />
+	</defaultcmd>
+	<defaultcmd target="Teleport">
+		<cmd name="teleport" />
+	</defaultcmd>
+	<defaultcmd target="Inn">
+		<cmd name="transport" />
+		<cmd name="approach" />
+	</defaultcmd>
+
+	<sounds walk="UnitWalk" />
+</class>

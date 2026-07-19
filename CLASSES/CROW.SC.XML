@@ -1,0 +1,6 @@
+<class id="Crow" parent="CrowUnit" cpp_class="CVXFlyingUnit" entity="Units/Crow/Crow.ent.xml">
+	<properties no_transparent_draw="1" />
+	<properties edittree_pos="Units/Animals/Crow (wild)" />
+	<method sig="idle" vs="data/subai/crow_idle.vs" />
+	<sounds idle="Crow_Idle" />
+</class>

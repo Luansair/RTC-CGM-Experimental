@@ -1,0 +1,33 @@
+<class id="Fisherman" parent="Peaceful" cpp_class="CVXUnit" entity="units/BVillager/BVillager.ent.xml">
+
+	<properties maxhealth="100" />
+	<properties sight="150" />
+	<properties speed="60" />
+	<properties unit_specials="Freedom" />
+
+	<properties display_name="Fisherman" display_name_plural="Fishermen" />
+	<properties icon="gameres/icons/Fisherman.bmp" />
+	<properties help="contents/units/Fisherman" />
+	<properties edittree_pos="Units/Others/Fisherman" />
+
+	<method sig="idle" vs="data/subai/fisherman_idle.vs" />
+	<method sig="enter" vs="data/subai/fisherman_enter.vs" verify="data/subai/fisherman_enter_verify.vs" />
+	<method sig="enter_alone" vs="data/subai/fisherman_enter.vs" />
+	<method sig="advance_enter" vs="data/subai/fisherman_enter.vs" />
+	<method sig="follow" vs="data/subai/do_nothing_obj.vs" verify="data/subai/do_nothing_verify.vs" />
+
+	<defaultcmd target="Building">
+		<cmd name="approach" />
+	</defaultcmd>
+	<defaultcmd target="BaseShipyard">
+		<cmd name="enterfisherman" />
+	</defaultcmd>
+	<defaultcmd target="Teleport">
+		<cmd name="teleport" />
+	</defaultcmd>
+	<defaultcmd target="Inn">
+		<cmd name="transport" />
+	</defaultcmd>
+
+	<sounds command="VoiceFisherman" walk="UnarmoredUnitWalk" />
+</class>

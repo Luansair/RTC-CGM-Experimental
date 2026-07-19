@@ -1,0 +1,40 @@
+<class id="HPriest" parent="BaseMage" cpp_class="CVXDruid" entity="Units/HPriest/HPriest.ent.xml">
+
+	<properties race="ImperialRome" />
+	<properties maxhealth="180" />
+	<properties armor_slash="2" armor_pierce="2" />
+	<properties speed="60" />
+	<properties unit_specials="Healing, Keen sight" />
+
+	<properties display_name="Priest" display_name_plural="Priests" />
+	<properties icon="gameres/icons/HPriest.bmp" />
+	<properties help="contents/units/HPriest" />
+	<properties edittree_pos="Units/Greece/Priest" />
+
+	<method sig="heal" vs="data/subai/druid_heal_unit.vs" verify="data/subai/druid_heal_verify.vs" />
+	<method sig="heal" vs="data/subai/druid_heal_ground.vs" />
+	<method sig="restoration" vs="data/subai/druid_selfdestroy.vs" />
+
+	<method sig="idle" vs="data/subai/druid_heal_idle.vs" />
+	<method sig="stand_position" vs="data/subai/druid_heal_stand_position.vs" />
+	<method sig="hold_position" vs="data/subai/druid_heal_stand_position.vs" />
+	<method sig="advance" vs="data/subai/druid_heal_advance.vs" />
+	<method sig="advance_alone" vs="data/subai/druid_heal_advance.vs" />
+	<method sig="advance_aggressive" vs="data/subai/druid_heal_advance.vs" />
+	<method sig="engage" vs="data/subai/druid_heal_engage.vs" />
+	<method sig="ai_killall" vs="data/subai/druid_heal_engage.vs" />
+
+	<method sig="ondie" vs="data/subai/ienchantress_hpriest_ondie.vs" />
+
+	<defaultcmd target="Unit">
+		<cmd name="heal" />
+	</defaultcmd>
+	<defaultcmd target="Hero">
+		<cmd name="attach" />
+	</defaultcmd>
+	<defaultcmd target="ShipBattle">
+		<cmd name="boardship" />
+	</defaultcmd>
+
+	<sounds command="VoiceHPriest" />
+</class>

@@ -1,0 +1,3 @@
+<class id="MTavern2" parent="RTavern2" cpp_class="CVXTavern" entity="Buildings/Rhouse02/Rhouse02_as.ent.xml" entity_winter="Buildings/Rhouse02/Rhouse02_w.ent.xml">
+	<properties edittree_pos="" />
+</class>

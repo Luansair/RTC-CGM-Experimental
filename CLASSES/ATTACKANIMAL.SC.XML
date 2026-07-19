@@ -1,0 +1,16 @@
+<class id="AttackAnimal" parent="BaseAnimal" cpp_class="CVXUnit">
+
+	<properties damage_type="slash" />
+	<properties healthbar_type="3" />
+
+	<defaultcmd target="Unit">
+		<cmd name="attack" />
+		<cmd name="attack_unit_type_exclusive" ctrl="1" />
+	</defaultcmd>
+	<defaultcmd target="ShipBattle">
+		<cmd name="boardship" />
+	</defaultcmd>
+	<defaultcmd target="Catapult">
+		<cmd name="attack" />
+	</defaultcmd>
+</class>

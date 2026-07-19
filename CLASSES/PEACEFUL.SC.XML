@@ -1,0 +1,47 @@
+<class id="Peaceful" parent="Unit" cpp_class="CVXUnit">
+
+	<properties damage="0" damage_type="none" />
+	<properties range="17" min_range="2" />
+	<properties radius="15" selection_radius="15" />
+	<properties formation_priority="100" />
+	<properties formation_radius="26" />
+	<properties target_factor="1000" />
+
+	<method sig="idle" vs="data/subai/peaceful_idle.vs" />
+	<method sig="attack" vs="data/subai/unit_approach.vs" verify="data/subai/do_nothing_verify.vs" />
+	<method sig="attack_unit_type_exclusive" vs="data/subai/unit_approach.vs" verify="data/subai/do_nothing_verify.vs" />
+	<method sig="ai_attack_gate" vs="data/subai/unit_approach.vs" />
+	<method sig="advance" vs="data/subai/unit_move.vs" />
+	<method sig="advance_alone" vs="data/subai/unit_move.vs" />
+	<method sig="advance_aggressive" vs="data/subai/unit_move.vs" />
+	<method sig="enter" vs="data/subai/peaceful_enter.vs" verify="data/subai/peaceful_enter_verify.vs" />
+	<method sig="enter_alone" vs="data/subai/peaceful_enter.vs" />
+	<method sig="advance_enter" vs="data/subai/peaceful_enter.vs" />
+	<method sig="stand_position" vs="data/subai/unit_standstill.vs" />
+	<method sig="hold_position" vs="data/subai/unit_standstill.vs" />
+
+	<method sig="engage" vs="data/subai/do_nothing_void.vs" />
+	<method sig="engage_unit_type_exclusive" vs="data/subai/do_nothing_void.vs" />
+	<method sig="capture" vs="data/subai/do_nothing_obj.vs" verify="data/subai/do_nothing_verify.vs" />
+	<method sig="build_catapult" vs="data/subai/do_nothing_obj.vs" />
+	<method sig="ai_killall" vs="data/subai/do_nothing_void.vs" />
+
+	<value1 icon="gameres/infobar/common/attack ico.bmp"
+		script="return Translate('No');"
+		help="contents/stats/attack"
+		rollover="Damage"
+	/>
+
+	<defaultcmd target="ShipBattle">
+		<cmd name="boardship" />
+	</defaultcmd>
+	<defaultcmd target="Building">
+		<cmd name="enter" />
+	</defaultcmd>
+	<defaultcmd target="Teleport">
+		<cmd name="teleport" />
+	</defaultcmd>
+	<defaultcmd target="Inn">
+		<cmd name="transport" />
+	</defaultcmd>
+</class>

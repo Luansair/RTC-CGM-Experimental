@@ -1,0 +1,6 @@
+<class id="MWallsNE" parent="Wall" cpp_class="CVXBuilding" entity="Buildings/MWalls/WallNE/WallNE.ent.xml">
+	<properties race="ImperialRome" />
+	<properties sentry_class_name="HSentry" />
+	<properties wall_set="Imperial Roman walls" />
+	<properties icon="gameres/icons/HWalls.bmp" />
+</class>

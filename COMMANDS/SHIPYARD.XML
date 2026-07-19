@@ -1,0 +1,131 @@
+<commands>
+	<cmd name="createfoodboat1" priority="10"
+		method="createfoodboatsmall"
+		groupverifier="data/subai/create_food_wagon_verify.vs"
+		groupdispatch="data/subai/create_food_boat_small.vs"
+		button="actions/Create Boat Food Small.bmp"
+		queueicon="gameres/icons/Boat.bmp"
+		transpicon="1"
+		key="c"
+		rollover="Create Boat with 250 food">
+		<src obj="BaseShipyard" />
+	</cmd>
+	<cmd name="creategoldboat1" priority="11"
+		method="creategoldboatsmall"
+		groupverifier="data/subai/create_gold_wagon_verify.vs"
+		groupdispatch="data/subai/create_gold_boat_small.vs"
+		button="actions/Create Boat Gold Small.bmp"
+		queueicon="gameres/icons/Boat.bmp"
+		transpicon="1"
+		key="v"
+		rollover="Create Boat with 250 gold">
+		<src obj="BaseShipyard" />
+	</cmd>
+	<cmd name="createfoodboat2" priority="12"
+		method="createfoodboatbig"
+		groupverifier="data/subai/create_food_wagon_verify.vs"
+		groupdispatch="data/subai/create_food_boat_big.vs"
+		button="actions/Boat Food.bmp"
+		queueicon="gameres/icons/Boat.bmp"
+		transpicon="1"
+		key="b"
+		rollover="Create Boat with 1000 food">
+		<src obj="BaseShipyard" />
+	</cmd>
+	<cmd name="creategoldboat2" priority="13"
+		method="creategoldboatbig"
+		groupverifier="data/subai/create_gold_wagon_verify.vs"
+		groupdispatch="data/subai/create_gold_boat_big.vs"
+		button="actions/Boat Gold.bmp"
+		queueicon="gameres/icons/Boat.bmp"
+		transpicon="1"
+		key="n"
+		rollover="Create Boat with 1000 gold">
+		<src obj="BaseShipyard" />
+	</cmd>
+	<cmd name="buildship" priority="14"
+		method="build_ship"
+		traincommand="yes"
+		groupverifier="data/subai/shipyard_build_ship_verify.vs"
+		button="actions/Ship.bmp"
+		queueicon="gameres/icons/Ship.bmp"
+		param="ShipL"
+		key="s"
+		costgold="1000"
+		execdelay="20000"
+		transpicon="1"
+		rollover="Create Ship">
+		<src obj="BaseShipyard" />
+	</cmd>
+	<cmd name="buildshipRome" priority="14"
+		method="build_ship"
+		traincommand="yes"
+		groupverifier="data/subai/shipyard_build_ship_verify.vs"
+		button="actions/ShipRome.bmp"
+		queueicon="gameres/icons/ShipRome.bmp"
+		param="ShipRome"
+		key="s"
+		costgold="1000"
+		execdelay="20000"
+		transpicon="1"
+		rollover="Create Roman Ship">
+		<src obj="BaseShipyard" />
+	</cmd>
+	<cmd name="buildshipEgypt" priority="14"
+		method="build_ship"
+		traincommand="yes"
+		groupverifier="data/subai/shipyard_build_ship_verify.vs"
+		button="actions/ShipEgypt.bmp"
+		queueicon="gameres/icons/ShipEgypt.bmp"
+		param="ShipEgypt"
+		key="s"
+		costgold="1000"
+		execdelay="20000"
+		transpicon="1"
+		rollover="Create Egyptian Ship">
+		<src obj="BaseShipyard" />
+	</cmd>
+	<!-- used only by AI (since it cheats for the cost, this avoids the exploit where a human player with shared control stops the command to get free resources) -->
+	<cmd name="buildshipAi"
+		method="build_ship"
+		traincommand="yes"
+		queueicon="gameres/icons/Ship.bmp"
+		param="ShipL"
+		execdelay="20000"
+		transpicon="1">
+		<src obj="BaseShipyard" />
+	</cmd>
+	<!-- used only by AI (since it cheats for the cost, this avoids the exploit where a human player with shared control stops the command to get free resources) -->
+	<cmd name="buildshipRomeAi"
+		method="build_ship"
+		traincommand="yes"
+		queueicon="gameres/icons/ShipRome.bmp"
+		param="ShipRome"
+		execdelay="20000"
+		transpicon="1">
+		<src obj="BaseShipyard" />
+	</cmd>
+	<!-- used only by AI (since it cheats for the cost, this avoids the exploit where a human player with shared control stops the command to get free resources) -->
+	<cmd name="buildshipEgyptAi"
+		method="build_ship"
+		traincommand="yes"
+		queueicon="gameres/icons/ShipEgypt.bmp"
+		param="ShipEgypt"
+		execdelay="20000"
+		transpicon="1">
+		<src obj="BaseShipyard" />
+	</cmd>
+	<cmd name="deployFishermen" priority="15"
+		button="actions/call Fisherman.bmp"
+		queueicon="gameres/icons/Fisherman.bmp"
+		transpicon="1"
+		groupverifier="data/subai/shipyard_deploy_fishermen_verify.vs"
+		traincommand="yes"
+		key="e"
+		execdelay="10000"
+		method="deploy_fishermen"
+		rollover="Deploy fishermen"
+		description="Deploys up to 5 fishermen from the shipyard">
+		<src obj="BaseShipyard" />
+	</cmd>
+</commands>

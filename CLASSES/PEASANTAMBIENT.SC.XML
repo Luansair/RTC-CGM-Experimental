@@ -1,0 +1,32 @@
+<class id="PeasantAmbient" parent="Peaceful" cpp_class="CVXUnit">
+
+	<properties maxhealth="1" maxstamina="0" />
+	<properties sight="150" />
+	<properties speed="60" />
+	<properties inventory_size="0" />
+	<properties feeds="0" max_food="0" />
+
+	<properties select_class="PeasantAmbient" />
+
+	<properties healthbar_type="0" />
+	<properties no_transparent_draw="1" />
+
+	<method sig="talk" vs="data/subai/peasant_ambient_talk.vs" />
+	<method sig="grab_free" vs="data/subai/peasant_ambient_grab_free.vs" />
+	<method sig="grab_goods" vs="data/subai/peasant_ambient_grab_goods.vs" />
+	<method sig="grab_water" vs="data/subai/peasant_ambient_grab_water.vs" />
+	<method sig="disappear" vs="data/subai/peasant_ambient_disappear.vs" />
+
+	<method sig="move" vs="data/subai/peasant_ambient_move.vs" />
+
+	<method sig="form_move" vs="data/subai/unit_detach.vs" />
+	<method sig="follow" vs="data/subai/do_nothing_obj.vs" verify="data/subai/do_nothing_verify.vs" />
+	<method sig="attach" vs="data/subai/do_nothing_obj.vs" verify="data/subai/do_nothing_verify.vs" />
+	<method sig="enter" vs="data/subai/do_nothing_obj.vs" verify="data/subai/do_nothing_verify.vs" />
+	<method sig="enter_alone" vs="data/subai/do_nothing_obj.vs" />
+	<method sig="advance_enter" vs="data/subai/do_nothing_obj.vs" />
+	<method sig="boardship" vs="data/subai/do_nothing_obj.vs" verify="data/subai/do_nothing_verify.vs" />
+	<method sig="boardshipcommon" vs="data/subai/do_nothing_obj.vs" />
+
+	<nodefcmdinherit />
+</class>

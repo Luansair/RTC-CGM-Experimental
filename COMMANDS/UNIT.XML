@@ -1,0 +1,253 @@
+<commands>
+	<!-- DEFAULT COMMANDS (NO INTERFACE BUTTON AND ONLY USED BY CLASSES WITH THE CORRESPONDING METHOD) -->
+	<cmd name="approach">
+		<cmdtext target="Object" default-text="Right-click to approach" />
+	</cmd>
+	<cmd name="advance" offset="1" cursor="attack">
+		<cmdtext target="" default-text="Right-click to advance to this position" />
+	</cmd>
+	<cmd name="attack_unit_type_exclusive" cursor="attack">
+		<cmdtext target="Unit" default-text="Right-click to attack this type of enemy" />
+	</cmd>
+	<cmd name="sentry_attack" method="attack" cursor="attack">
+		<cmdtext target="Unit" default-text="Right-click to attack this enemy" />
+		<cmdtext target="Building" default-text="Right-click to attack this building" />
+	</cmd>
+	<cmd name="attach" cursor="do_something">
+		<cmdtext target="Hero" default-text="Right-click to attach to this hero" />
+	</cmd>
+	<cmd name="teleport" cursor="do_something">
+		<cmdtext target="Teleport" default-text="Right-click to enter this cave" />
+	</cmd>
+	<cmd name="enter" cursor="do_something">
+		<cmdtext target="Building" default-text="Right-click to enter this building" />
+	</cmd>
+	<cmd name="enterfisherman" method="enter" cursor="do_something">
+		<cmdtext target="BaseShipyard" default-text="Right-click to enter this shipyard and start fishing" />
+	</cmd>
+	<cmd name="enterwildhorse" method="enter" cursor="do_something">
+		<cmdtext target="IVillage" default-text="Right-click to enter this village and provide a mount for scouts" />
+	</cmd>
+	<cmd name="getitems" cursor="do_something">
+		<cmdtext target="ItemHolder" default-text="Right-click to get all items" />
+	</cmd>
+	<cmd name="transport" offset="1" cursor="do_something">
+		<cmdtext target="Inn" default-text="Right-click to transport from this Inn" />
+	</cmd>
+	<cmd name="boardship" cursor="do_something">
+		<cmdtext target="ShipBattle" default-text="Right-click to board this ship" />
+	</cmd>
+	<!-- INTERFACE COMMANDS (WITH BUTTON) -->
+	<cmd name="move" priority="1"
+		offset="1"
+		button="Actions/Move.bmp"
+		rollover="Move"
+		key="m">
+		<cmdtext target="" text="Click to move to this position" />
+		<src obj="Unit" sticky="yes" />
+		<nsrc obj="Sentry" />
+	</cmd>
+	<cmd name="stand_position" priority="2"
+		offset="1"
+		button="Actions/Stand Ground.bmp"
+		key="s"
+		rollover="Stand ground"
+		groupverifier="data/subai/unit_stand_position_verify.vs"
+		groupdispatch="data/subai/unit_stand_position_dispatch.vs"
+		voidgroupdispatch="1">
+		<src obj="Unit" sticky="yes" />
+		<nsrc obj="Sentry" />
+		<nsrc obj="Eagle" />
+		<nsrc obj="CrowUnit" />
+	</cmd>
+	<cmd name="patrol" priority="3"
+		offset="1"
+		button="actions/patrol.bmp"
+		key="p"
+		rollover="Patrol">
+		<cmdtext target="" text="Click to patrol this position" />
+		<src obj="Military" sticky="yes" />
+		<src obj="AttackAnimal" sticky="yes" />
+		<nsrc obj="Sentry" />
+		<nsrc obj="RamUnit" />
+	</cmd>
+	<cmd name="attack" priority="4"
+		offset="1"
+		button="Actions/Attack.bmp"
+		key="a"
+		rollover="Attack"
+		cursor="attack">
+		<cmdtext target="Unit" text="Click to attack this enemy" default-text="Right-click to attack this enemy" />
+		<cmdtext target="Building" text="Click to attack this building" default-text="Right-click to attack this building" />
+		<cmdtext target="" text="Click to advance to this position" />
+		<src obj="Military" sticky="yes" />
+		<src obj="AttackAnimal" sticky="yes" />
+		<nsrc obj="Sentry" />
+	</cmd>
+	<cmd name="capture" priority="5"
+		offset="1"
+		button="Actions/capture.bmp"
+		key="u"
+		rollover="Capture"
+		cursor="do_something">
+		<cmdtext target="Wall" text="Walls cannot be captured, only attacked" default-text="Walls cannot be captured, only attacked" />
+		<cmdtext target="Gate" text="Gates cannot be captured, only attacked" default-text="Gates cannot be captured, only attacked" />
+		<cmdtext target="Tower" text="Towers cannot be captured, only attacked" default-text="Towers cannot be captured, only attacked" />
+		<cmdtext target="Building" text="Click to capture this settlement" default-text="Right-click to capture this settlement" />
+		<cmdtext target="Wagon" text="Click to capture this caravan" default-text="Right-click to capture this caravan" />
+		<cmdtext target="WildHorse" text="Click to tame this horse" default-text="Right-click to tame this horse" />
+		<src obj="Military" sticky="yes" />
+		<nsrc obj="ShipBattle" />
+		<nsrc obj="Sentry" />
+		<nsrc obj="RamUnit" />
+	</cmd>
+	<cmd name="explore" priority="6"
+		offset="1"
+		button="Actions/explore.bmp"
+		rollover="Explore"
+		key="e">
+		<cmdtext target="" text="Click to explore from this position" />
+		<src obj="Unit" sticky="yes" />
+		<nsrc obj="Sentry" />
+		<nsrc obj="RamUnit" />
+		<nsrc obj="Eagle" />
+		<nsrc obj="CrowUnit" />
+	</cmd>
+	<cmd name="train" priority="7"
+		button="actions/training.bmp"
+		groupverifier="data/subai/unit_train_verify.vs"
+		key="t"
+		rollover="Train">
+		<src obj="Military" sticky="yes" />
+		<nsrc obj="ShipBattle" />
+		<nsrc obj="Sentry" />
+		<nsrc obj="RamUnit" />
+	</cmd>
+	<cmd name="detach" priority="8"
+		button="actions/detach.bmp"
+		groupverifier="data/subai/unit_detach_verify.vs"
+		immediate="yes"
+		key="d"
+		rollover="Detach from hero">
+		<src obj="Unit" sticky="yes" />
+		<nsrc obj="Hero" />
+		<nsrc obj="Wagon" />
+		<nsrc obj="BaseAnimal" />
+		<nsrc obj="GGhostUnit" />
+		<nsrc obj="ShipBattle" />
+		<nsrc obj="Sentry" />
+		<nsrc obj="RamUnit" />
+	</cmd>
+	<cmd name="reveal" priority="11"
+		button="Actions/reveal.bmp"
+		groupverifier="data/subai/unit_reveals_verify.vs"
+		groupdispatch="data/subai/unit_reveals.vs"
+		voidgroupdispatch="1"
+		key="q"
+		rollover="Reveal">
+		<src obj="Unit" />
+	</cmd>
+	<cmd name="build_catapult" priority="12"
+		offset="1"
+		button="actions/Build Catapult.bmp"
+		key="c"
+		groupdispatch="data/subai/build_catapult.vs"
+		rollover="Build siege machine">
+		<cmdtext target="" text="Select a place to build the machine" />
+		<src obj="Military" />
+		<nsrc obj="Hero" />
+		<nsrc obj="ShipBattle" />
+		<nsrc obj="Sentry" />
+		<nsrc obj="RamUnit" />
+	</cmd>
+	<cmd name="take_nearby_items" priority="13"
+		button="actions/Take Nearby Items.bmp"
+		key="r"
+		groupverifier="data/subai/unit_take_nearby_items_verify.vs"
+		groupdispatch="data/subai/unit_take_nearby_items_dispatch.vs"
+		voidgroupdispatch="1"
+		rollover="Take nearby items">
+		<src obj="Unit" />
+		<nsrc obj="Sentry" />
+		<nsrc obj="RamUnit" />
+		<nsrc obj="Wagon" />
+		<nsrc obj="Eagle" />
+		<nsrc obj="CrowUnit" />
+	</cmd>
+	<cmd name="enter_parry_mode" priority="14"
+		button="actions/Parry Mode.bmp"
+		key="k"
+		groupverifier="data/subai/unit_parry_mode_enter_verify.vs"
+		groupdispatch="data/subai/unit_parry_mode_enter.vs"
+		voidgroupdispatch="1"
+		rollover="Enter parry mode">
+		<src obj="Unit" sticky="yes" />
+		<nsrc obj="Sentry" />
+		<nsrc obj="RamUnit" />
+	</cmd>
+	<cmd name="leave_parry_mode" priority="15"
+		button="actions/Leave Parry Mode.bmp"
+		key="l"
+		groupverifier="data/subai/unit_parry_mode_leave_verify.vs"
+		groupdispatch="data/subai/unit_parry_mode_leave.vs"
+		voidgroupdispatch="1"
+		rollover="Leave parry mode">
+		<src obj="Unit" />
+	</cmd>
+	<cmd name="select_special_units" priority="16"
+		button="actions/Select Special Units.bmp"
+		key="w"
+		groupdispatch="data/subai/select_special_units.vs"
+		voidgroupdispatch="1"
+		rollover="Select special units"
+		description="Selects all special units of the currently selected types across the map (except those attached to a hero)">
+		<src obj="RChariot" />
+		<src obj="RLiberatus" />
+		<src obj="GTridentWarrior" />
+		<src obj="IMountaineer" />
+		<src obj="CWarElephant" />
+		<src obj="BVikingLord" />
+		<src obj="EChariot" />
+		<src obj="TValkyrie" />
+		<src obj="HMyrmidon_Javelin" />
+	</cmd>
+	<cmd name="to_peasant" priority="16"
+		button="actions/disband.bmp"
+		key="w"
+		groupdispatch="data/subai/imilitiaman_mutate_dispatch.vs"
+		voidgroupdispatch="1"
+		rollover="Demobilize"
+		description="Transforms the militiamen into peasants (only in buildings and ships)">
+		<src obj="IMilitiaman" />
+	</cmd>
+	<cmd name="to_teuton_archer" priority="16"
+		button="actions/train TTeutonArcher.bmp"
+		key="w"
+		groupverifier="data/subai/teuton_mutate_verify.vs"
+		groupdispatch="data/subai/teuton_mutate_dispatch.vs"
+		voidgroupdispatch="1"
+		rollover="Convert to Teuton Archer"
+		description="Transforms the Riders into Archers (only in buildings and ships)">
+		<src obj="TTeutonRider" />
+	</cmd>
+	<cmd name="to_teuton_wolf" priority="16"
+		button="actions/train TTeutonWolf.bmp"
+		key="w"
+		groupverifier="data/subai/teuton_mutate_verify.vs"
+		groupdispatch="data/subai/teuton_mutate_dispatch.vs"
+		voidgroupdispatch="1"
+		rollover="Convert to Teuton Wolf"
+		description="Transforms the Archers into Wolves (only in buildings and ships)">
+		<src obj="TTeutonArcher" />
+	</cmd>
+	<cmd name="to_teuton_rider" priority="16"
+		button="actions/train TTeutonRider.bmp"
+		key="w"
+		groupverifier="data/subai/teuton_mutate_verify.vs"
+		groupdispatch="data/subai/teuton_mutate_dispatch.vs"
+		voidgroupdispatch="1"
+		rollover="Convert to Teuton Rider"
+		description="Transforms the Wolves into Riders (only in buildings and ships)">
+		<src obj="TTeutonWolf" />
+	</cmd>
+</commands>

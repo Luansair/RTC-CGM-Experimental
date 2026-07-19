@@ -1,0 +1,20 @@
+<class id="WildHorse" parent="WildHorseUnit" cpp_class="CVXUnit" entity="Units/WildHorse/WildHorse.ent.xml">
+
+	<properties speed="100" /><!-- the speed is changed in the scripts -->
+	<properties edittree_pos="Units/Animals/Horse (wild)" />
+
+	<method sig="trot" vs="data/subai/wildhorse_trot.vs" onfinish="data/subai/deer_wildhorse_reset_walk_anim.vs" />
+
+	<method sig="idle" vs="data/subai/wildhorse_idle.vs" onfinish="data/subai/deer_wildhorse_reset_walk_anim.vs" />
+	<method sig="enter" vs="data/subai/wildhorse_enter.vs" verify="data/subai/wildhorse_enter_verify.vs" />
+	<method sig="enter_alone" vs="data/subai/wildhorse_enter.vs" />
+	<method sig="advance_enter" vs="data/subai/wildhorse_enter.vs" />
+
+	<value0 icon="gameres/infobar/common/Loyality.bmp" />
+
+	<defaultcmd target="IVillage">
+		<cmd name="enterwildhorse" />
+	</defaultcmd>
+
+	<sounds idle="Sounds/Animals/WHorse/Horse_Command.wav" />
+</class>

@@ -1,0 +1,19 @@
+<class id="HOutpost" parent="Outpost" cpp_class="CVXOutpost" entity="Buildings/HOutpost/HOutpost.ent.xml">
+	<properties race="ImperialRome" />
+	<properties maxhealth="10000" />
+	<properties display_name="Recruitment outpost" />
+	<properties icon="gameres/icons/houtpost.bmp" />
+	<properties help="contents/buildings/RecruitmentOutpost" />
+	<properties edittree_pos="Structures/Outposts/Recruitment outpost (Greek)" />
+	<properties description="Converts peasants to Hoplites" />
+	<properties
+		settlement_food="2000"
+		settlement_gold="0"
+		defender_cls_1="HHoplite"
+		defenders_max_1="20"
+		defenders_out_1="12"
+		start_level_1="6"
+		end_level_1="10"
+	/>
+	<behavior script="data/subai/houtpost_behavior.vs" />
+</class>

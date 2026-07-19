@@ -1,0 +1,77 @@
+<class id="ShipBattle" parent="Ranged" cpp_class="CVXShip" entity="">
+
+	<properties maxhealth="3000" />
+	<properties damage="100" armor_slash="20" armor_pierce="20" />
+	<properties damage_type="pierce" />
+	<properties sight="720" />
+	<properties range="700" />
+	<properties speed="240" />
+	<properties unit_specials="Active, Combat skill, Determination, Ferocity, Freedom, Penetration" />
+
+	<properties projectile_class="Big_Arrow" building_projectile_class="Big_Arrow" />
+
+	<properties radius="90" selection_radius="90" />
+	<properties healthbar_type="1" />
+	<properties healthbaroffset="-120" />
+	<properties water_unit="1" />
+	<properties max_units_to_board="120" /><!-- if this value is changed, sequences in "The conquest of Britain" adventure must be changed, too -->
+
+	<properties select_class="ShipBattle" />
+
+	<properties display_name="Ship" display_name_plural="Ships" />
+	<properties icon="gameres/icons/Ship.bmp" />
+	<properties interface="thumb,holder,items" /><!-- with this setup there is no vertical bar and no special skill is showed, but items are visible and usable -->
+	<properties help="contents/units/Ship" />
+
+	<method sig="aitransport" vs="data/subai/ship_aitransport.vs" />
+	<method sig="boardunit" vs="data/subai/ship_board.vs" verify="data/subai/ship_board_verify.vs" onfinish="data/subai/ship_board_onfinish.vs" />
+	<method sig="unboard" vs="data/subai/ship_unboard.vs" />
+	<method sig="unboardall" vs="data/subai/ship_unboard_all.vs" verify="data/subai/ship_unboard_all_verify.vs" />
+
+	<method sig="idle" vs="data/subai/ship_idle.vs" />
+	<method sig="move" vs="data/subai/ship_move.vs" />
+	<method sig="follow" vs="data/subai/unit_follow_water.vs" verify="data/subai/unit_follow_water_verify.vs" />
+
+	<method sig="form_move" vs="data/subai/unit_detach.vs" />
+	<method sig="attach" vs="data/subai/do_nothing_obj.vs" verify="data/subai/do_nothing_verify.vs" />
+	<method sig="enter" vs="data/subai/do_nothing_obj.vs" verify="data/subai/do_nothing_verify.vs" />
+	<method sig="enter_alone" vs="data/subai/do_nothing_obj.vs" />
+	<method sig="advance_enter" vs="data/subai/do_nothing_obj.vs" />
+	<method sig="teleport" vs="data/subai/do_nothing_obj.vs" />
+	<method sig="build_catapult" vs="data/subai/do_nothing_obj.vs" />
+	<method sig="boardship" vs="data/subai/do_nothing_obj.vs" verify="data/subai/do_nothing_verify.vs" />
+	<method sig="boardshipcommon" vs="data/subai/do_nothing_obj.vs" />
+	<method sig="capture" vs="data/subai/do_nothing_obj.vs" verify="data/subai/do_nothing_verify.vs" />
+	<method sig="guard_enter" vs="data/subai/do_nothing_obj.vs" />
+	<method sig="guard_advance" vs="data/subai/do_nothing_point.vs" />
+	<method sig="guard_patrol" vs="data/subai/do_nothing_point.vs" />
+	<method sig="guard_engage" vs="data/subai/do_nothing_void.vs" />
+	<method sig="taunt" vs="data/subai/do_nothing_void.vs" />
+	<method sig="train" vs="data/subai/do_nothing_void.vs" />
+
+	<nodefcmdinherit />
+
+	<defaultcmd target="">
+		<cmd name="move" />
+		<cmd name="advance" ctrl="1" />
+	</defaultcmd>
+	<defaultcmd target="Object">
+		<cmd name="approach" />
+	</defaultcmd>
+	<defaultcmd target="Unit">
+		<cmd name="boardunit" />
+		<cmd name="attack" />
+		<cmd name="attack_unit_type_exclusive" ctrl="1" />
+	</defaultcmd>
+	<defaultcmd target="Building">
+		<cmd name="attack" />
+	</defaultcmd>
+	<defaultcmd target="Inn">
+		<cmd name="approach" />
+	</defaultcmd>
+	<defaultcmd target="ItemHolder">
+		<cmd name="getitems" />
+	</defaultcmd>
+
+	<sounds walk="ShipWalk" attack="ShipAttack" die="ShipDeath" />
+</class>

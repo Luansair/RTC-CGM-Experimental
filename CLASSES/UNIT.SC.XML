@@ -1,0 +1,117 @@
+<class id="Unit" parent="Object" cpp_class="CVXUnit">
+
+	<properties maxhealth="200" />
+	<properties maxstamina="10" />
+	<properties sight="500" />
+	<properties speed="50" />
+	<properties water_unit="0" />
+	<properties repair_rate="15" />
+	<properties damage_type="slash" />
+	<properties damage="10" armor_slash="0" armor_pierce="0" />
+	<properties inventory_size="4" />
+	<properties does_not_regenerate="0" />
+	<properties healthbar_type="1" />
+
+	<properties feeds="1" max_food="20" />
+	<properties damaged_by_ghost="1" />
+	<properties can_be_invisible="1" />
+	<properties interface="thumb,unit,items" />
+	<properties ignore_passability="0" />
+	<properties formation_radius="26" radius="15" selection_radius="15" />
+
+	<properties icon="gameres/icons/multi.bmp" />
+	<properties display_name="Unit" display_name_plural="Units" />
+	<properties help="contents/units" />
+
+	<behavior script="data/subai/keensight_sneak_freedom_behavior.vs" />
+
+	<method sig="idle" vs="data/subai/unit_idle.vs" />
+	<method sig="move" vs="data/subai/unit_move.vs" />
+	<method sig="form_move" vs="data/subai/unit_form_move.vs" />
+	<method sig="advance" vs="data/subai/unit_advance.vs" />
+	<method sig="advance_alone" vs="data/subai/unit_advance.vs" />
+	<method sig="advance_aggressive" vs="data/subai/unit_advance_aggressive.vs" />
+	<method sig="detach" vs="data/subai/unit_detach.vs" />
+	<method sig="attach" vs="data/subai/unit_attach.vs" verify="data/subai/unit_attach_verify.vs" />
+	<method sig="attack" vs="data/subai/unit_attack.vs" verify="data/subai/unit_attack_verify.vs" />
+	<method sig="attack" vs="data/subai/unit_attack_ground.vs" />
+	<method sig="engage" vs="data/subai/unit_engage.vs" />
+	<method sig="enter" vs="data/subai/unit_enter.vs" verify="data/subai/unit_enter_verify.vs" />
+	<method sig="enter_alone" vs="data/subai/unit_enter.vs" />
+	<method sig="advance_enter" vs="data/subai/unit_advance_enter.vs" />
+	<method sig="patrol" vs="data/subai/unit_patrol.vs" />
+	<method sig="approach" vs="data/subai/unit_approach.vs" />
+	<method sig="follow" vs="data/subai/unit_follow.vs" verify="data/subai/unit_follow_verify.vs" />
+	<method sig="getitems" vs="data/subai/unit_getitems.vs" />
+	<method sig="getitem" vs="data/subai/unit_getitem.vs" />
+	<method sig="putitem" vs="data/subai/unit_putitem.vs" />
+	<method sig="giveitem" vs="data/subai/unit_giveitem.vs" />
+	<method sig="dropitem" vs="data/subai/unit_dropitem.vs" />
+	<method sig="take_nearby_items" vs="data/subai/unit_take_nearby_items.vs" />
+	<method sig="build_catapult" vs="data/subai/unit_build_catapult.vs" />
+	<method sig="standstill" vs="data/subai/unit_standstill.vs" />
+	<method sig="stand_position" vs="data/subai/unit_stand_position.vs" />
+	<method sig="hold_position" vs="data/subai/unit_hold_position.vs" />
+	<method sig="wander" vs="data/subai/unit_wander.vs" />
+	<method sig="explore" vs="data/subai/unit_explore.vs" />
+	<method sig="teleport" vs="data/subai/unit_teleport.vs" />
+	<method sig="face" vs="data/subai/unit_face.vs" />
+	<method sig="ai_attack_gate" vs="data/subai/unit_ai_attack_gate.vs" />
+	<method sig="ai_killall" vs="data/subai/unit_ai_killall.vs" />
+	<method sig="boardship" vs="data/subai/unit_board.vs" verify="data/subai/unit_board_verify.vs" onfinish="data/subai/unit_board_onfinish.vs" />
+	<method sig="boardshipcommon" vs="data/subai/unit_board_common.vs" onfinish="data/subai/unit_board_onfinish.vs" />
+	<method sig="capture" vs="data/subai/unit_capture.vs" verify="data/subai/unit_capture_verify.vs" />
+	<method sig="capture" vs="data/subai/do_nothing_point.vs" />
+	<method sig="transport" vs="data/subai/unit_transport.vs" verify="data/subai/unit_transport_verify.vs" />
+	<method sig="dismiss" vs="data/subai/unit_dismiss.vs" />
+	<method sig="walk_and_die" vs="data/subai/unit_walk_and_die.vs" />
+	<method sig="attack_unit_type_exclusive" vs="data/subai/unit_attack_unit_type_exclusive.vs" verify="data/subai/unit_attack_verify.vs" />
+	<method sig="engage_unit_type_exclusive" vs="data/subai/unit_engage_unit_type_exclusive.vs" />
+	<method sig="go_talk" vs="data/subai/unit_go_talk.vs" />
+	<method sig="onkill" vs="data/subai/unit_on_kill.vs" />
+	<method sig="onenter" vs="data/subai/unit_on_enter.vs" />
+
+	<method sig="arrow_helper" vs="data/subai/arrow_helper.vs" />
+
+	<value0 icon="gameres/infobar/common/level ico.bmp"
+		script="return .AsUnit().level;"
+		help="contents/stats/level"
+		rollover="Level"
+	/>
+	<value1 icon="gameres/infobar/common/attack ico.bmp"
+		script="return .AsUnit().damage;"
+		help="contents/stats/attack"
+		rollover="Damage"
+	/>
+	<value2 icon="gameres/infobar/common/stamina ico.bmp"
+		script="return .AsUnit().stamina + '|' + .AsUnit().speed;"
+		help="contents/stats/stamina"
+		rollover="Stamina|Speed"
+	/>
+	<value3 icon="gameres/infobar/common/defence ico.bmp"
+		script="return .AsUnit().armor_slash + '|' + .AsUnit().sight;"
+		help="contents/stats/defense"
+		rollover="Armor|Sight"
+	/>
+	<value4 icon="gameres/infobar/common/health ico.bmp"
+		script="return .AsUnit().health + '/' + .AsUnit().maxhealth;"
+		help="contents/stats/health"
+		rollover="Health"
+	/>
+	<value5 icon="gameres/infobar/common/food ico.bmp"
+		script="return .AsUnit().food + '/' + .AsUnit().maxfood;"
+		help="contents/feeding"
+		rollover="Food"
+	/>
+
+	<defaultcmd target="">
+		<cmd name="move" />
+		<cmd name="advance" ctrl="1" />
+	</defaultcmd>
+	<defaultcmd target="Object">
+		<cmd name="approach" />
+	</defaultcmd>
+	<defaultcmd target="ItemHolder">
+		<cmd name="getitems" />
+	</defaultcmd>
+</class>

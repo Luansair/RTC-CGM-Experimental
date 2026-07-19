@@ -1,0 +1,42 @@
+<class id="TEnchantress" parent="BaseMage" cpp_class="CVXDruid" entity="Units/TEnchantress/TEnchantress.ent.xml">
+
+	<properties race="Germany" />
+	<properties maxhealth="140" />
+	<properties armor_slash="6" armor_pierce="6" />
+	<properties speed="60" />
+	<properties unit_specials="Curse" />
+
+	<properties display_name="Enchantress" display_name_plural="Enchantresses" />
+	<properties icon="gameres/icons/TEnchantress.bmp" />
+	<properties help="contents/units/TEnchantress" />
+	<properties edittree_pos="Units/Germany/Enchantress" />
+
+	<method sig="curse" vs="data/subai/druid_curse_unit.vs" verify="data/subai/druid_curse_verify.vs" />
+	<method sig="curse" vs="data/subai/druid_curse_ground.vs" />
+	<method sig="wolf_summoning" vs="data/subai/druid_wolf_summoning.vs" />
+	<method sig="deer_summoning" vs="data/subai/druid_deer_summoning.vs" />
+	<method sig="mass_heal" vs="data/subai/druid_selfdestroy.vs" />
+
+	<method sig="idle" vs="data/subai/druid_curse_idle.vs" />
+	<method sig="stand_position" vs="data/subai/druid_curse_stand_position.vs" />
+	<method sig="hold_position" vs="data/subai/druid_curse_stand_position.vs" />
+	<method sig="advance" vs="data/subai/druid_curse_advance.vs" />
+	<method sig="advance_alone" vs="data/subai/druid_curse_advance.vs" />
+	<method sig="advance_aggressive" vs="data/subai/druid_curse_advance.vs" />
+	<method sig="engage" vs="data/subai/druid_curse_engage.vs" />
+	<method sig="ai_killall" vs="data/subai/druid_curse_engage.vs" />
+
+	<method sig="ondie" vs="data/subai/bdruid_tenchantress_ondie.vs" />
+
+	<defaultcmd target="Unit">
+		<cmd name="curse" />
+	</defaultcmd>
+	<defaultcmd target="Hero">
+		<cmd name="attach" />
+	</defaultcmd>
+	<defaultcmd target="ShipBattle">
+		<cmd name="boardship" />
+	</defaultcmd>
+
+	<sounds command="VoiceTEnchantress" die="UnitDeathFemale" />
+</class>

@@ -1,0 +1,11 @@
+<class id="CHero4" parent="HeroMounted" cpp_class="CVXHero" entity="Units/CHero4/CHero4.ent.xml">
+
+	<properties race="Carthage" />
+	<properties HeroSkills="Vigor, Frenzy, Rush, Egoism, Wisdom" />
+
+	<properties display_name="Zurfah" />
+	<properties icon="gameres/icons/CHero4.bmp" />
+	<properties edittree_pos="Units/Heroes/Zurfah (Carthaginian)" />
+
+	<sounds command="VoiceCHero" />
+</class>

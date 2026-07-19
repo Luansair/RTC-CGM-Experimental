@@ -1,0 +1,35 @@
+<class id="Fish" parent="Animal" cpp_class="CVXUnit" entity="Units/Fish/Fish.ent.xml">
+
+	<properties maxhealth="100" />
+	<properties sight="300" />
+	<properties speed="110" />
+	<properties inventory_size="0" />
+
+	<properties radius="20" selection_radius="100" />
+	<properties healthbar_type="0" />
+	<properties water_unit="1" always_visible_on_minimap="0" />
+
+	<properties display_name="Fish" display_name_plural="Fish" />
+	<properties icon="gameres/icons/Fish.bmp" />
+	<properties help="contents/units/Animals/Fish" />
+	<properties edittree_pos="Units/Animals/Fish" />
+
+	<method sig="idle" vs="data/subai/fish_idle.vs" />
+	<method sig="follow" vs="data/subai/unit_follow_water.vs" verify="data/subai/unit_follow_water_verify.vs" />
+
+	<method sig="enter" vs="data/subai/do_nothing_obj.vs" verify="data/subai/do_nothing_verify.vs" />
+	<method sig="enter_alone" vs="data/subai/do_nothing_obj.vs" />
+	<method sig="advance_enter" vs="data/subai/do_nothing_obj.vs" />
+	<method sig="teleport" vs="data/subai/do_nothing_obj.vs" />
+	<method sig="boardship" vs="data/subai/do_nothing_obj.vs" verify="data/subai/do_nothing_verify.vs" />
+	<method sig="boardshipcommon" vs="data/subai/do_nothing_obj.vs" />
+
+	<nodefcmdinherit />
+
+	<defaultcmd target="">
+		<cmd name="move" />
+	</defaultcmd>
+	<defaultcmd target="Object">
+		<cmd name="approach" />
+	</defaultcmd>
+</class>

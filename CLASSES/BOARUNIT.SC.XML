@@ -1,0 +1,19 @@
+<class id="BoarUnit" parent="AttackAnimal" cpp_class="CVXUnit" entity="units/Boar/Boar.ent.xml">
+
+	<properties maxhealth="320" />
+	<properties damage="20" armor_slash="6" armor_pierce="6" />
+	<properties sight="450" />
+	<properties speed="70" />
+	<properties unit_specials="Combat skill, Defense skill, Freedom" />
+
+	<properties radius="40" selection_radius="41" />
+
+	<properties select_class="BoarUnit" />
+
+	<properties display_name="Boar" display_name_plural="Boars" />
+	<properties icon="gameres/icons/Boar.bmp" />
+	<properties help="contents/units/Animals/Boar" />
+	<properties edittree_pos="Units/Animals/Boar" />
+
+	<sounds command="Sounds/Animals/Boar/Boar_Idle.wav" attack="Sounds/Animals/Boar/Boar_Attack.wav" die="Sounds/Animals/Boar/Boar_Die.wav" />
+</class>

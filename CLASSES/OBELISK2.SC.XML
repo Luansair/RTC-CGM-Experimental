@@ -1,0 +1,8 @@
+<class id="Obelisk2" parent="ItemHolder" cpp_class="CVXItemHolder" entity="MapObjects/Obelisk2/Obelisk2.ent.xml">
+	<properties radius="30" selection_radius="30" />
+	<properties display_name="Obelisk" />
+	<properties icon="gameres/icons/Obelisk2.bmp" />
+	<properties edittree_pos="Structures/Item holders/Obelisk 2" />
+	<properties respawn_item="Boar tooth" respawn_time="600000" />
+	<method sig="idle" vs="data/subai/anim.vs" />
+</class>

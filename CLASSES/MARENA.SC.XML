@@ -1,0 +1,4 @@
+<class id="MArena" parent="RArena" cpp_class="CVXBuilding" entity="Buildings/MArena/MArena.ent.xml" entity_winter="Buildings/RArena/RArena_w.ent.xml">
+	<properties icon="gameres/icons/MArena.bmp" />
+	<properties edittree_pos="Structures/Stronghold (Republican Rome)/Arena (alternative)" />
+</class>

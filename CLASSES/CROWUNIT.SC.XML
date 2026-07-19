@@ -1,0 +1,56 @@
+<class id="CrowUnit" parent="Animal" cpp_class="CVXFlyingUnit" entity="Units/Crow/Crow.ent.xml">
+
+	<properties maxhealth="25" />
+	<properties sight="950" />
+	<properties speed="180" />
+	<properties inventory_size="0" />
+
+	<properties radius="10" selection_radius="20" />
+	<properties healthbar_type="0" />
+
+	<properties select_class="CrowUnit" />
+
+	<properties display_name="Crow" display_name_plural="Crows" />
+	<properties icon="gameres/icons/crow.bmp" />
+	<properties help="contents/units/Animals/Crow" />
+	<properties edittree_pos="Units/Animals/Crow" />
+
+	<method sig="move" vs="data/subai/crow_move.vs" />
+	<method sig="advance" vs="data/subai/crow_move.vs" />
+	<method sig="advance_alone" vs="data/subai/crow_move.vs" />
+	<method sig="advance_aggressive" vs="data/subai/crow_move.vs" />
+	<method sig="approach" vs="data/subai/unit_approach_flying.vs" />
+	<method sig="follow" vs="data/subai/unit_approach_flying.vs" />
+	<method sig="attack" vs="data/subai/unit_approach_flying.vs" />
+	<method sig="ai_attack_gate" vs="data/subai/unit_approach_flying.vs" />
+	<method sig="attack_unit_type_exclusive" vs="data/subai/unit_approach_flying.vs" />
+	<method sig="transport" vs="data/subai/unit_approach_flying.vs" />
+	<method sig="walk_and_die" vs="data/subai/unit_walk_and_die_flying.vs" />
+	<method sig="go_talk" vs="data/subai/unit_go_talk_flying.vs" />
+
+	<method sig="explore" vs="data/subai/do_nothing_point.vs" />
+	<method sig="wander" vs="data/subai/do_nothing_point.vs" />
+	<method sig="enter" vs="data/subai/do_nothing_obj.vs" verify="data/subai/do_nothing_verify.vs" />
+	<method sig="enter_alone" vs="data/subai/do_nothing_obj.vs" />
+	<method sig="advance_enter" vs="data/subai/do_nothing_obj.vs" />
+	<method sig="teleport" vs="data/subai/do_nothing_obj.vs" />
+	<method sig="boardship" vs="data/subai/do_nothing_obj.vs" verify="data/subai/do_nothing_verify.vs" />
+	<method sig="boardshipcommon" vs="data/subai/do_nothing_obj.vs" />
+	<method sig="getitems" vs="data/subai/do_nothing_obj.vs" />
+	<method sig="getitem" vs="data/subai/do_nothing_item_obj.vs" />
+	<method sig="putitem" vs="data/subai/do_nothing_item_obj.vs" />
+	<method sig="giveitem" vs="data/subai/do_nothing_item_obj.vs" />
+	<method sig="dropitem" vs="data/subai/do_nothing_item_point.vs" />
+	<method sig="take_nearby_items" vs="data/subai/do_nothing_void.vs" />
+
+	<nodefcmdinherit />
+
+	<defaultcmd target="">
+		<cmd name="move" />
+	</defaultcmd>
+	<defaultcmd target="Object">
+		<cmd name="approach" />
+	</defaultcmd>
+
+	<sounds walk="Crow_Idle" command="Sounds/Animals/Crow/Crow_Command.wav" die="Sounds/Animals/Crow/Crow_Death.wav" />
+</class>

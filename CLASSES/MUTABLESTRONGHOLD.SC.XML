@@ -1,0 +1,6 @@
+<class id="MutableStronghold" parent="BaseTownhall" cpp_class="CVXTownHall" entity="Buildings/MutableStronghold/MutableStronghold.ent.xml">
+	<properties race="Mutable" />
+	<properties radius="1100" selection_radius="1100" />
+	<properties display_name="Any Race Stronghold" />
+	<properties edittree_pos="Structures/Any Race Stronghold" />
+</class>

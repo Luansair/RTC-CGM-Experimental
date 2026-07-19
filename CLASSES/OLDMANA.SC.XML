@@ -1,0 +1,4 @@
+<class id="OldManA" parent="OldMan" cpp_class="CVXUnit" entity="units/OldManA/OldManA.ent.xml">
+	<properties race="Egypt" />
+	<properties edittree_pos="Units/Others/Old Man (Africa)" />
+</class>

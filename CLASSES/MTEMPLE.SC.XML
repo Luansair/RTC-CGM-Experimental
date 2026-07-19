@@ -1,0 +1,4 @@
+<class id="MTemple" parent="RTemple" cpp_class="CVXBarrack" entity="Buildings/MTemple/MTemple.ent.xml" entity_winter="Buildings/RTemple/RTemple_w.ent.xml">
+	<properties icon="gameres/icons/MTemple.bmp" />
+	<properties edittree_pos="Structures/Stronghold (Republican Rome)/Temple (alternative)" />
+</class>

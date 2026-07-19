@@ -1,0 +1,27 @@
+<class id="Peasant" parent="Peaceful" cpp_class="CVXUnit">
+
+	<properties maxhealth="100" />
+	<properties sight="150" />
+	<properties speed="60" />
+
+	<properties select_class="Peasant" />
+
+	<properties display_name="Peasant" display_name_plural="Peasants" />
+	<properties help="contents/units/Villagers" />
+
+	<method sig="enter" vs="data/subai/peasant_enter.vs" verify="data/subai/peasant_enter_verify.vs" />
+	<method sig="enter_alone" vs="data/subai/peasant_enter.vs" />
+	<method sig="advance_enter" vs="data/subai/peasant_enter.vs" />
+
+	<defaultcmd target="Building">
+		<cmd name="enter" />
+	</defaultcmd>
+	<defaultcmd target="Teleport">
+		<cmd name="teleport" />
+	</defaultcmd>
+	<defaultcmd target="Inn">
+		<cmd name="transport" />
+	</defaultcmd>
+
+	<sounds walk="UnarmoredUnitWalk" />
+</class>

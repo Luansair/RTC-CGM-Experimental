@@ -1,0 +1,12 @@
+//void, ObjList objs, point pt, Obj obj, bool bReplace, bool bModifier, int player
+
+Obj o;
+int i;
+
+for (i = objs.count - 1; i >= 0; i -= 1) {
+	o = objs[i];
+	if (o.IsAlive)
+		if (o.AsUnit().InHolder)
+			if (IsResearched(o.player, "Teuton Master"))
+				o.SetCommand("convert");
+}

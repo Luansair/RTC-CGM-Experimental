@@ -1,0 +1,4 @@
+<class id="MTownhall" parent="RTownhall" cpp_class="CVXTownHall" entity="Buildings/MTownhall/MTownhall.ent.xml" entity_winter="Buildings/RTownhall/RTownhall_w.ent.xml">
+	<properties icon="gameres/icons/MTownhall.bmp" />
+	<properties edittree_pos="Structures/Stronghold (Republican Rome)/Townhall (alternative)" />
+</class>

@@ -1,0 +1,6 @@
+<class id="GHero2" parent="GaulHero" cpp_class="CVXHero" entity="Units/GHero2/GHero2.ent.xml">
+	<properties display_name="Ogox" />
+	<properties icon="gameres/icons/GHero2.bmp" />
+	<properties edittree_pos="Units/Gaul/Hero 2" />
+	<sounds attack="AxeAttack" />
+</class>

@@ -1,0 +1,13 @@
+<class id="HGymnasium" parent="BaseArena" cpp_class="CVXBuilding" entity="Buildings/HGymnasium/HGymnasium.ent.xml">
+
+	<properties race="ImperialRome" />
+	<properties radius="350" selection_radius="355" />
+
+	<properties display_name="Gymnasium" />
+	<properties icon="gameres/icons/HGymnasium.bmp" />
+	<properties help="contents/buildings/HGymnasium" />
+	<properties edittree_pos="Structures/Stronghold (Imperial Rome)/Gymnasium" /><!-- keep Imperial Rome otherwise the walls will not be shown in the editor -->
+
+	<method sig="myrmidon_school" vs="data/subai/myrmidons_school.vs" />
+	<method sig="government_form" vs="data/subai/government_form_research.vs" onfinish="data/subai/government_form_onfinish.vs" />
+</class>

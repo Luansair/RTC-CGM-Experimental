@@ -1,0 +1,12 @@
+<class id="BaseBarracks" parent="BaseTownBuilding" cpp_class="CVXBarrack" entity="">
+
+	<properties interface="thumb,building,queue" />
+	<properties display_name="Barracks" />
+
+	<behavior script="data/subai/arena_behavior.vs" />
+
+	<method sig="train" vs="data/subai/barrack_train.vs" />
+	<method sig="trainex" vs="data/subai/barrack_trainex.vs" />
+
+	<sounds select="BarracksSelect" />
+</class>

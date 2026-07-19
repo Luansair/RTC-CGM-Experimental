@@ -1,0 +1,14 @@
+<commands>
+	<!-- DEFAULT COMMANDS (NO INTERFACE BUTTON AND ONLY USED BY CLASSES WITH THE CORRESPONDING METHOD) -->
+	<cmd name="boardunit" cursor="do_something">
+		<cmdtext target="Unit" default-text="Right-click to board this ally" />
+	</cmd>
+	<!-- INTERFACE COMMANDS (WITH BUTTON) -->
+	<cmd name="unboardall" priority="9"
+		button="actions/Unl Ship.bmp"
+		key="u"
+		rollover="Unboard units">
+		<cmdtext target="" text="Click to unboard all units at this position" />
+		<src obj="ShipBattle" />
+	</cmd>
+</commands>
