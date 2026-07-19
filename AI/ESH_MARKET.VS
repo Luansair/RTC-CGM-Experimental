@@ -371,32 +371,33 @@ if (nRace == ImperialRome) {
 //useful researches/commands - foreign mercenaries and slavery (Carthage)
 if (nRace == Carthage)
 	if (strTech == "") {
-		if (IsResearched(aiPlayer, "Mercenary pact"))
-			if (IsResearched(aiPlayer, "Mercenary heal")) {
-				Building b;
-				b = set.FindResearchLab("Hire foreign mercenaries");
-				if (b.IsValid)
-					if (!b.IsBroken)
-						if (b.CmdCount("Hire foreign mercenaries") < 1) {
-							int gold, food;
-							if (GetCmdCost("Hire foreign mercenaries", gold, food))
-								if (set.CanAfford("Hire foreign mercenaries")) {
-									point ptDummy;
-									Obj objDummy;
-									if (EnvReadString(set, "ReserveFor" + (aiPlayer - 1)) == "Hire foreign mercenaries") {
-										set.StopReserving();
-										EnvWriteString(set, "ReserveFor" + (aiPlayer - 1), "");
+		if (rand(65) == 0)
+			if (IsResearched(aiPlayer, "Mercenary pact"))
+				if (IsResearched(aiPlayer, "Mercenary heal")) {
+					Building b;
+					b = set.FindResearchLab("Hire foreign mercenaries");
+					if (b.IsValid)
+						if (!b.IsBroken)
+							if (b.CmdCount("Hire foreign mercenaries") < 1) {
+								int gold, food;
+								if (GetCmdCost("Hire foreign mercenaries", gold, food))
+									if (set.CanAfford("Hire foreign mercenaries")) {
+										point ptDummy;
+										Obj objDummy;
+										if (EnvReadString(set, "ReserveFor" + (aiPlayer - 1)) == "Hire foreign mercenaries") {
+											set.StopReserving();
+											EnvWriteString(set, "ReserveFor" + (aiPlayer - 1), "");
+										}
+										set.SpentGoldOnArmy(gold + food / 2);
+										b.ExecCmd("Hire foreign mercenaries", ptDummy, objDummy, false);
 									}
-									set.SpentGoldOnArmy(gold + food / 2);
-									b.ExecCmd("Hire foreign mercenaries", ptDummy, objDummy, false);
-								}
-								else if (set.gold >= gold - 1200)
-									if (set.food >= food + 600) {
-										strTech = "Hire foreign mercenaries";
-										bForceResearch = true;
-									}
-						}
-			}
+									else if (set.gold >= gold - 1200)
+										if (set.food >= food + 600) {
+											strTech = "Hire foreign mercenaries";
+											bForceResearch = true;
+										}
+							}
+				}
 		if (strTech == "")
 			if (rand(3) == 0) {
 				str cmd;
@@ -542,8 +543,11 @@ if (rand(2) == 0)
 				cmd = "HAddPop";
 		}
 		else if (nRace == Carthage) {
-			if (rand(2) == 0)//the random is because the Carthaginian version is expensive
-				cmd = GetRaceStrPref(nRace) + "AddPop";
+			if (nAssUnderFire <= 0)
+				if (set.food > 10000 && set.population < set.max_population * 3 / 10)
+					cmd = GetRaceStrPref(nRace) + "AddPop";
+				else if (set.food > 15000 && set.population < set.max_population / 2)
+					cmd = GetRaceStrPref(nRace) + "AddPop";
 		}
 		else
 			cmd = GetRaceStrPref(nRace) + "AddPop";
@@ -581,9 +585,14 @@ if (rand(2) == 0) {
 		if (strTech == "")
 			cmd = "HSellFood";
 	}
-	else if (nRace == Carthage)
-		if (rand(15) == 0)
+	else if (nRace == Carthage) {
+		if (set.food > set.gold * 2 && set.food > 2500) {
+			if (rand(3) == 0)
+				cmd = "CSellFood";
+		}
+		else if (rand(15) == 0)
 			cmd = "CSellFood";
+	}
 	if (cmd != "")
 		if (set.population >= set.max_population * 3 / 5)
 			if (set.food >= EnvReadInt(set, "nFoodReserve") + 400)
@@ -610,10 +619,10 @@ if (set.food < 2500) {
 	if (nRace == Germany)
 		cmd = "buyfoodforgold";
 	else if (nRace == Carthage) {
-		if (rand(2) == 0)
-			cmd = "buyfoodforgold";
+		if (set.gold > set.food * 2 && set.gold > 1250)
+			if (rand(2) == 0)
+				cmd = "buyfoodforgold";
 	}
-	else if (nRace == RepublicanRome)
 		if (IsResearched(set, "ChooseRepublicanRome"))
 			cmd = "buyfoodforgold";
 		else if (IsResearched(set, "ChoosePunicRome"))
