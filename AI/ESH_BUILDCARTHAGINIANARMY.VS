@@ -7,14 +7,13 @@ int nAssUnderFire;
 nAssUnderFire = EnvReadInt(set, "AssUnderFire");//set in ES_Stronghold
 
 if (nAssUnderFire > 0 || set.gold >= 800) {
-	int aiPlayer, nArmyBuilds, nMilUnits, nType, nSpecTime;
+	int aiPlayer, nArmyBuilds, nMilUnits, nType;
 	bool bCanBuildNobles;
 
 	aiPlayer = set.player;
 
 	nArmyBuilds = EnvReadInt(set, "nArmyBuilds");//set in ES_Stronghold
 	nMilUnits = MilUnits(aiPlayer);
-	nSpecTime = EnvReadInt(set, "nSpecTime");
 
 	//decide whether to build army at all
 	if (nAssUnderFire > 0)
@@ -100,7 +99,7 @@ if (nAssUnderFire > 0 || set.gold >= 800) {
 	}
 
 	else if (nType != 5) {
-		if (nSpecTime <= 0)//this check is used to avoid a specialization change right after specific tactic scripts
+		if (EnvReadInt(set, "nSpecTime") <= 0)//this check is used to avoid a specialization change right after specific tactic scripts
 			EnvWriteInt(set, "nSpecTime", GetTime() + 300000 + rand(300001));//one-time initial delay after tactics
 		if (GetTime() >= EnvReadInt(set, "nSpecTime")) {
 			
