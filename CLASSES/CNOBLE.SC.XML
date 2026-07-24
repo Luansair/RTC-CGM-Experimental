@@ -4,7 +4,7 @@
 	<properties maxhealth="345" />
 	<properties damage="50" armor_slash="22" armor_pierce="22" />
 	<properties speed="70" />
-	<properties unit_specials="Learning, Toughness, Triumph" />
+	<properties unit_specials="Toughness, Life steal" />
 
 	<properties formation_priority="1000" />
 
