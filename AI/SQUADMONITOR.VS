@@ -367,6 +367,60 @@ while (true) {
 										}
 									}
 								}
+							// Cambiar botines de guerra por oro
+							if (nSqState != SS_KillAll && nSqState != SS_Flee && nSqState != SS_Enter) {
+								if (sqLeader.BestTargetInSquadSight.IsDead) {
+									int nTotalSpoils, j, k;
+									ObjList squadUnits;
+									Unit u;
+									Item item;
+
+									squadUnits = sq.Units;
+
+									for (j = 0; j < squadUnits.count; j += 1) {
+										u = squadUnits[j].AsUnit();
+										if (u.IsAlive) {
+											int nItems;
+											nItems = u.items_count;
+											if (nItems > 0) {
+												for (k = 0; k < nItems; k +=1) {
+													item = u.GetItem(k);
+													if (item.IsValid)
+														if (item.name == "Spoils of War")
+															nTotalSpoils += 1;
+												}
+											}
+										}
+									}
+									if (nTotalSpoils >= 10) {
+										if (bValidSetGkIn) {
+											if (setGkIn.IsAlly(aiPlayer) && !setGkIn.IsFull) {
+												int nDist;
+												nDist = sqPos.Dist(setGkInCentralBuilding.pos);
+												if (nDist <= 2000) {
+													sq.SetCmd(SS_Enter, 0, SF_ADVCHOOSER, "enter", setGkInCentralBuilding);
+													Sleep(100);
+													continue;
+												}
+											}
+										}
+										if (!bValidSetGkIn || !setGkIn.IsAlly(aiPlayer)) {
+											Settlement s;
+											s = NearestStronghold(sqPos, aiPlayer);
+											if (s.IsValid) {
+												int nDist;
+												nDist = sqPos.Dist(s.GetCentralBuilding().pos);
+												if (nDist <= 2000 && !s.IsFull) {
+													sq.SetCmd(SS_Enter, 0, SF_ADVCHOOSER, "enter", s.GetCentralBuilding());
+													Sleep(100);
+													continue;
+												}
+											}
+										}
+									}
+								}
+							}
+							
 
 							if (nSqState == SS_Flee)//stop fleeing to heal and check if stopping fleeing is worth
 								if (sq.InHolder)
