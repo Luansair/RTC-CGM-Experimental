@@ -1,71 +1,51 @@
-//void, Settlement set
+// void, Settlement set
 
-//called by ES_Stronghold, this script finds the best trade outpost and makes sure food is sent there in order to earn gold
+// Called by ES_Stronghold, this script finds outposts (Gaul/Germany) that need food
+// and sends a mule to one of them per execution.
+// Multiple outposts are supported: the script iterates and processes the first
+// one that needs attention, automatically rotating between them.
 
-int aiPlayer;
-GAIKA gSellFood;
+int aiPlayer, nLsa, nMaxSetIdx, i;
 Settlement sSell;
+Building b;
 
 aiPlayer = set.player;
+nLsa = set.GetCentralBuilding().LSA;
+nMaxSetIdx = MaxSetIdx;
 
-gSellFood = GetGAIKA(EnvReadInt(set, "gSellFood"));
-sSell = gSellFood.settlement;
-if (!sSell.IsValid)
-	gSellFood = 0;
-else if (!sSell.IsOwn(aiPlayer))
-	gSellFood = 0;
-else if (!sSell.supplied.IsValid)
-	gSellFood = 0;
+for (i = 0; i < nMaxSetIdx; i += 1) {
+    sSell = IdxToSet(i);
+    if (!sSell.IsValid)
+        continue;
+    if (!sSell.IsOwn(aiPlayer))
+        continue;
+    if(!sSell.IsOutpost)
+        continue;
 
-if (gSellFood == 0) {//find best place to sell food
-	GAIKA g;
-	Building b;
-	int nMaxSetIdx, nLsa, nRace, nOwnDist, nAllyDist, nEnemyDist, nEval, best, i;
-	point gCenter;
+    b = sSell.GetCentralBuilding();
+    if (b.LSA != nLsa)  // Debe estar en la misma masa terrestre
+        continue;
 
-	nMaxSetIdx = MaxSetIdx;
-	nLsa = set.GetCentralBuilding().LSA;//using LandLsa does not work (it is for shipyards)
-	gCenter = set.GetGaika().Center;
+    if (b.race != Gaul && b.race != Germany)
+        continue;
 
-	for (i = 0; i < nMaxSetIdx; i += 1) {
-		sSell = IdxToSet(i);
-		if (sSell.IsOwn(aiPlayer))
-			if (sSell.IsOutpost) {
-				b = sSell.GetCentralBuilding();
-				if (b.LSA == nLsa) {
-					nRace = b.race;
-					if (nRace != Gaul)
-						if (nRace != Germany)
-							continue;
-					if (!sSell.supplied.IsValid) {
-						g = sSell.GetGaika();
-						g.GetDistToPlayers(aiPlayer, nOwnDist, nAllyDist, nEnemyDist);
-						if (nEnemyDist < 0)
-							nEnemyDist = 32000;
-						nEval = nEnemyDist - g.Center.Dist(gCenter);
-						if (nEval > best) {
-							gSellFood = g;
-							best = nEval;
-						}
-					}
-				}
-			}
-	}
-	if (gSellFood != 0) {//new place to sell food
-		sSell = gSellFood.settlement;
-		EnvWriteInt(set, "gSellFood", gSellFood.ID);
-		sSell.StartSupplyFood(set);
-	}
+    if (!sSell.supplied.IsValid) {
+        sSell.StartSupplyFood(set);
+        EnvWriteInt(set, "FoodTradeMuleWait", GetTime() + 20000);
+        return;
+    }
+
+    if (sSell.supplied.IsValid) {
+        if (sSell.food < 500) {
+            Wagon mule;
+            mule = set.CreateMuleFood(MIN(1000, set.food - 1000));
+            if (mule.IsValid) {
+                mule.SetCommand("unload", b);
+                EnvWriteInt(set, "FoodTradeMuleWait", GetTime() + 20000);
+            }
+            return;
+        }
+    }
 }
 
-if (gSellFood != 0) {//place to sell food
-	sSell = gSellFood.settlement;
-	if (sSell.food < 500) {
-		Wagon mule;
-		mule = set.CreateMuleFood(MIN(1000, set.food - 1000));//do not go below 1000 food in the stronghold (to start the script, there must be at least 1100 food)
-		if (mule.IsValid) {
-			mule.SetCommand("unload", sSell.GetCentralBuilding());
-			EnvWriteInt(set, "FoodTradeMuleWait", GetTime() + 20000);//avoid sending too many mules (the road to the outpost can be quite long)
-		}
-	}
-}
+// If we reach here, no outpost for food trade needed atention...

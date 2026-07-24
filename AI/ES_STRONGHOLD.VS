@@ -192,7 +192,7 @@ while (set.player == aiPlayer) {
 	set.AIRun("ESH_Market.vs");
 
 	//gold and food trade
-	if (MilEval(aiPlayer) >= nAvgEnemyEval) {
+	if (MilEval(aiPlayer) * 3 >= nAvgEnemyEval * 2) {
 		if (nTradeGold > 0)
 			if (set.gold >= 1000)
 				if (EnvReadInt(aiPlayer, "GoldTradeOutposts") < nTradeGold)
