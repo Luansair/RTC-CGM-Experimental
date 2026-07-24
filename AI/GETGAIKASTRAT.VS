@@ -77,9 +77,42 @@ if (nOwn > 0) {
 
 	if (bEnemyArmy) {
 		if (!bEnemySet)
-			return GS_KillEnemies;
+			if (nOwn + nAlly >= nEnemy * 10) {
+				return GS_Guard;
+			}
+			else if (nOwn + nAlly >= nEnemy) {
+				return GS_KillEnemies;
+			}
+			else if (nOwn + nAlly >= nEnemy * 4 / 5) {
+				if (rand(3) == 0)
+					return GS_KillEnemies;
+			}
+			else if (nOwn + nAlly >= nEnemy * 3 / 5) {
+				if (rand(6) == 0)
+					return GS_KillEnemies;
+			}
+			else if (nOwn + nAlly >= nEnemy * 2 / 5) {
+				if (rand(15) == 0)
+					return GS_KillEnemies;
+			} else if (rand(80) == 0)
+				return GS_KillEnemies;
 		if (bCanEnter)
-			return GS_KillEnemies;
+			if (nOwn + nAlly >= nEnemy) {
+				return GS_KillEnemies;
+			}
+			else if (nOwn + nAlly >= nEnemy * 4 / 5) {
+				if (rand(3) == 0)
+					return GS_KillEnemies;
+			}
+			else if (nOwn + nAlly >= nEnemy * 3 / 5) {
+				if (rand(6) == 0)
+					return GS_KillEnemies;
+			}
+			else if (nOwn + nAlly >= nEnemy * 2 / 5) {
+				if (rand(15) == 0)
+					return GS_KillEnemies;
+			} else if (rand(80) == 0)
+				return GS_KillEnemies;
 	}
 
 	if (bEnemySet)

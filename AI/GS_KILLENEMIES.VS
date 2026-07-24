@@ -112,8 +112,57 @@ if (set.IsValid)
 
 				if (bEnter)
 					state = SS_Enter;
-				else {
-					state = SS_KillAll;
+				else {  // Campo abierto
+					// Evaluacion poder enemigo, evitar pelear contra enemigos mas fuertes
+					int nOwn, nAlly, nEnemy, enemy_hidden;
+
+					gaika.Eval(AI_STAYING + AI_COMING, aiPlayer, nOwn, nAlly, nEnemy, enemy_hidden);
+					if (nOwn + nAlly >= nEnemy) {
+						state = SS_KillAll;
+					} 
+					else if ((nOwn + nAlly) * 5 >= nEnemy * 4) {
+						if (rand(2) == 0)
+							state = SS_KillAll;
+					} 
+					else if ((nOwn + nAlly) * 5 >= nEnemy * 3) {
+						if (rand(4) == 0)
+							state = SS_KillAll;
+					}
+					else if ((nOwn + nAlly) * 5 >= nEnemy * 2) {
+						if (rand(10) == 0)
+							state = SS_KillAll;
+					} else if (rand(80) == 0) {
+						state = SS_KillAll;
+					} else
+						state = SS_Flee;
+					
+					// Evaluacion huida enemigo
+					{
+						bool bAllEnemiesFleeing = true;
+						SquadList enemySL;
+
+						gaika.GetSquads(enemySL, AI_STAYING + AI_COMING, aiPlayer, AI_ENEMY);
+
+						enemySL.Lock();
+						for(; !enemySL.EOL; enemySL.Next()) {
+							Squad es;
+							es = enemySL.Cur;
+							if (es.State != SS_Flee) {
+								bAllEnemiesFleeing = false;
+								break;
+							}
+						}
+						enemySL.Unlock();
+
+						// No perseguir enemigos huyendo
+						if (bAllEnemiesFleeing) {
+							if (bIsStronghold && set.IsAlly(aiPlayer))
+								state = SS_Enter;
+							else
+								state = SS_IDLE;
+								squad.SendTo(gaika, 1);
+						}
+					}
 					if (bIsStronghold)
 						if (squadState == SS_Flee || squadState == SS_IDLE || squadState == SS_Enter)
 							if (squadLeader.AsHero().IsValid)
@@ -128,6 +177,8 @@ if (set.IsValid)
 							if (!squad.TestFlags(SF_PEACEFUL))
 								if (state == SS_Enter)
 									squad.SetCmd(SS_Enter, 0, SF_ADVCHOOSER, "enter", hall);
+								else if (state == SS_IDLE)
+									squad.ClrCmd(SS_IDLE, 0, SF_ADVCHOOSER);
 								else
 									squad.SetCmd(SS_KillAll, 0, SF_ADVCHOOSER, "ai_killall");
 			}
