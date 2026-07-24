@@ -126,13 +126,46 @@ while (true) {
 												}
 
 							if (nSqState == SS_KillAll) {
+								// Verificar dispersion de squad y reagrupar
+								if (sq.Size > 1) {
+									{
+										ObjList units;
+										point squadCenter;
+										int nCounted, ui, nScatter;
+
+										units = sq.Units;
+										for (ui = 0; ui < units.count; ui += 1) {
+											Unit u;
+											u = units[ui].AsUnit();
+											if (u.IsAlive && u != sqLeader) {
+												if (nCounted == 0)
+													squadCenter = u.pos;
+												else
+													squadCenter = squadCenter + u.pos;
+												nCounted += 1;
+											}
+										}
+										if (nCounted > 0) {
+											squadCenter = squadCenter / nCounted;
+
+											nScatter = sqLeader.pos.Dist(squadCenter);
+											if (nScatter > 400) {
+												sq.SetCmd(SS_KillAll, 0, SF_ADVCHOOSER, "advance", squadCenter);
+												Sleep(100);
+												continue;
+											}
+										}
+									}
+								}
+
+
 								if (sqLeader.command == "ai_killall" || sqLeader.command == "idle" || sqLeader.command == "stand_position") {
 									if (setGkAiDest.IsValid)
 										if (!sqLeader.IsVisible) {
 											sqLeader.SetLastAttackTime();
 											sqLeader.SetVisible(true);
 										}
-									if (sq.StateTime > 60000)
+									if (sq.StateTime > 20000)
 										if (setGkAiDest.IsValid) {
 											if (setGkAiDestCentralBuildingPos.Dist(sqPos) > 500)
 												sq.SetCmd(SS_KillAll, 0, SF_ADVCHOOSER, "advance", setGkAiDestCentralBuildingPos);
