@@ -3,8 +3,8 @@
 	<properties race="RepublicanRome" />
 	<properties maxhealth="220" />
 	<properties damage="18" armor_slash="8" armor_pierce="8" />
-	<properties speed="70" />
-	<properties unit_specials="Defensive tactics, Offensive tactics, Learning" />
+	<properties speed="80" />
+	<properties unit_specials="Offensive tactics" />
 
 	<properties projectile_class="Javelin" building_projectile_class="Javelin" />
 

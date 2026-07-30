@@ -6,7 +6,7 @@
 	<properties speed="70" />
 	<properties unit_specials="Ferocity, Parry, Penetration" />
 
-	<properties formation_priority="1000" />
+	<properties formation_priority="1100" />
 
 	<properties display_name="Tribune" display_name_plural="Tribunes" />
 	<properties icon="gameres/icons/RTribune.bmp" />

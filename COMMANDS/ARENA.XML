@@ -6,7 +6,7 @@
 		groupverifier="data/subai/verify_cmdcost_building.vs"
 		traincommand="yes"
 		key="h"
-		costgold="1200"
+		costgold="800"
 		execdelay="20000"
 		param="RepublicanRomanHero"
 		method="hirehero"
@@ -148,7 +148,7 @@
 		groupverifier="data/subai/verify_cmdcost_building.vs"
 		traincommand="yes"
 		key="h"
-		costgold="1200"
+		costgold="800"
 		execdelay="20000"
 		param="ImperialRomanHero"
 		method="hirehero"
@@ -187,28 +187,28 @@
 		button="Upgrades/standartization 2.bmp"
 		key="i"
 		queueicon="gameres/icons/upgrades/standartization 2.bmp"
-		costgold="2000"
+		costgold="1500"
 		execdelay="30000"
 		groupverifier="data/subai/research_verify.vs"
-		description="Makes all new warriors level 6 but unable to gain experience"
+		description="Makes all new warriors level 8 but unable to gain experience"
 		rollover="Standardization II"
 		method="research"
 		researchcommand="yes"
-		param="ReqSet, Gladiator Shows, , ReqPlr, Standartization I, , SetsPlr, max_battle_level, 6, SetsPlr, standard_spawn_level, 6, NamePlr, Standartization II">
+		param="ReqSet, Gladiator Shows, , ReqPlr, Standartization I, , SetsPlr, max_battle_level, 8, SetsPlr, standard_spawn_level, 8, NamePlr, Standartization II">
 		<src obj="RArena" />
 	</cmd>
 	<cmd name="Flexibility" priority="4"
 		button="Upgrades/flexibility.bmp"
 		key="i"
 		queueicon="gameres/icons/upgrades/Flexibility.bmp"
-		costgold="4000"
+		costgold="2000"
 		execdelay="30000"
 		groupverifier="data/subai/research_verify.vs"
-		description="Makes all new warriors level 8 and able to gain experience"
+		description="Makes all new warriors level 12 and able to gain experience"
 		rollover="Flexibility"
 		method="research"
 		researchcommand="yes"
-		param="ReqSet, Gladiator Shows, , ReqPlr, Standartization II, , SetsPlr, max_battle_level, 0, SetsPlr, standard_spawn_level, 8, NamePlr, Flexibility, default">
+		param="ReqSet, Gladiator Shows, , ReqPlr, Standartization II, , SetsPlr, max_battle_level, 0, SetsPlr, standard_spawn_level, 12, NamePlr, Flexibility, default">
 		<src obj="RArena" />
 	</cmd>
 	<cmd name="Hire Liberati" priority="5"

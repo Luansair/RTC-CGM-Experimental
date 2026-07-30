@@ -121,7 +121,7 @@
 		costgold="3000"
 		execdelay="30000"
 		rollover="Improve Praetorian Equipment"
-		description="Reduces new Praetorians cost to 380 gold"
+		description="Reduces new Praetorians cost to 320 gold"
 		method="research"
 		param="ReqSet, Spike Armor, , NameSet, Improve Praetorian Equipment, default">
 		<src obj="RBlacksmith" />
