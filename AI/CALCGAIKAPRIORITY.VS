@@ -37,10 +37,18 @@ if (set.IsValid) {
 			int nRace;
 			nRace = set.GetCentralBuilding().race;
 			if (nRace == RepublicanRome)
-				nActualPerc += 10;
+				nActualPerc += 20;
 			else if (nRace == Egypt)
-				nActualPerc += 10;
+				nActualPerc += 20;
 		}
+		if (AIVar(aiPlayer, AIV_TradeFood) > 0) {
+			int nRace;
+			nRace = set.GetCentralBuilding().race;
+			if (nRace == Gaul || nRace == Germany) {
+				nActualPerc += 15;
+			}
+		}
+
 	}
 	else if (set.IsShipyard) {
 		nActualPerc = 60;
