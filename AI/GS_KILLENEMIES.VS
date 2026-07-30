@@ -120,17 +120,11 @@ if (set.IsValid)
 					if (nOwn + nAlly >= nEnemy) {
 						state = SS_KillAll;
 					} 
-					else if ((nOwn + nAlly) * 5 >= nEnemy * 4) {
-						if (rand(2) == 0)
-							state = SS_KillAll;
-					} 
 					else if ((nOwn + nAlly) * 5 >= nEnemy * 3) {
-						if (rand(4) == 0)
+						if (rand(6) == 0)
 							state = SS_KillAll;
-					}
-					else if ((nOwn + nAlly) * 5 >= nEnemy * 2) {
-						if (rand(10) == 0)
-							state = SS_KillAll;
+						else
+							state = SS_Flee;
 					} else if (rand(80) == 0) {
 						state = SS_KillAll;
 					} else
@@ -177,8 +171,10 @@ if (set.IsValid)
 							if (!squad.TestFlags(SF_PEACEFUL))
 								if (state == SS_Enter)
 									squad.SetCmd(SS_Enter, 0, SF_ADVCHOOSER, "enter", hall);
-								else if (state == SS_IDLE)
+								else if (state == SS_IDLE) {
 									squad.ClrCmd(SS_IDLE, 0, SF_ADVCHOOSER);
+									squad.SendTo(gaika, 1);
+								}
 								else
 									squad.SetCmd(SS_KillAll, 0, SF_ADVCHOOSER, "ai_killall");
 			}
