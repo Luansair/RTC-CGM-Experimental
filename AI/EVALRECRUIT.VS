@@ -1,29 +1,29 @@
 //int, Squad sq, GAIKA g, GAIKA *gDepend
 
+// This script evaluates the squad to send to support gaikas that need reinforcements
 GAIKA gCurDest;
 Unit sqLeader;
 Settlement set;
-int aiPlayer, lsaPathLen, nEval;
+int aiPlayer, lsaPathLen, nEval, avgUnitPower;
 bool bAssUnderFire;
 
 aiPlayer = sq.Player;
 bAssUnderFire = g.ID == EnvReadInt(aiPlayer, "AssUnderFireGaika");
 
+// Under attack it uses squads with no exception. Otherwise it looks for squads that are not doing anything relevant.
 if (!bAssUnderFire) {
 	int sqState;
 	sqState = sq.State;
-	if (sqState != SS_IDLE)
-		if (sqState != SS_Approach)
-			if (sqState != SS_Wait)
-				if (sqState != SS_ApproachWait)
-					if (sqState != SS_Enter)
-						return -1;
+	if (sqState != SS_IDLE && sqState != SS_Approach && sqState != SS_Wait && sqState != SS_ApproachWait && sqState != SS_Enter)
+		return -1;
 }
 
+// If Squad is already assigned to the desired GAIKA dont eval again.
 gCurDest = sq.AIDest;
 if (gCurDest == g)
 	return -2;
 
+// Checks if squad can reach the destinated GAIKA (via caves/transport)
 sqLeader = sq.Leader;
 if (sqLeader.AsShip().IsValid) {
 	if (sqLeader.AsShip().HasAiTransport)
@@ -47,9 +47,9 @@ else {
 		return -7;
 }
 
-set = g.settlement;
+set = g.settlement;  // Destination settlement
 
-//prevent scattering small armies
+// Prevent scattering small armies
 if (set.IsValid)
 	if (!set.IsOwn(aiPlayer))
 		if (!sqLeader.AsHero().IsValid)
@@ -61,6 +61,14 @@ if (set.IsValid)
 				if (set.IsIndependentGuarded)
 					return -10;
 			}
+// After 30 min avoid exploration and sending units to open spaces without a Hero.
+avgUnitPower = sq.Eval / sq.Size;
+if (GetTime() >= 1800000 && avgUnitPower >= 200) {
+    if (!sqLeader.AsHero().IsValid && !sqLeader.HasFreedom) {
+        if (!set.IsValid || !g.Explored(aiPlayer))
+            return -21;
+    }
+}
 
 if (!bAssUnderFire) {
 	Settlement s;
@@ -87,7 +95,7 @@ if (!bAssUnderFire) {
 			return -15;
 	}
 
-	s = sq.GAIKAIn.settlement;
+	s = sq.GAIKAIn.settlement;  // Settlement where the squad currently is / origin
 
 	if (set.IsValid)
 		if (set.IsVillage)
@@ -97,12 +105,13 @@ if (!bAssUnderFire) {
 						bFightForFood = true;
 
 		if (!bFightForFood)
+			// Squads with Hero
 			if (sqLeader.AsHero().IsValid) {
 			if (s.IsValid) {
 				//always enforce a minimum army size before sending a hero to fight (not only in strongholds)
 				{
 				int nHeroMin;
-				nHeroMin = AIVar(aiPlayer, AIV_HeroMinArmySize);
+				nHeroMin = AIVar(aiPlayer, AIV_HeroMinArmySize);  // Checks size instead of power. Uses pre defined variable instead of evaluating the context/situation like military power.
 					if (nHeroMin > 0)
 						if (sq.Size < nHeroMin)
 							if (!set.IsValid || !set.IsOwn(aiPlayer))
@@ -117,8 +126,10 @@ if (!bAssUnderFire) {
 						min = 20;
 					else if (time < 30)
 						min = 31;
-					else
+					else if (time < 60)
 						min = 41;
+					else
+						min = 50;
 					if (sq.Size < min)
 						return -16;
 				}
@@ -132,23 +143,24 @@ if (!bAssUnderFire) {
 							if (sq.health < sq.maxhealth * 4 / 5)
 								return -18;//heal first
 			}
-		}
-		else {
-			if (sq.Size < 10) {
-				Settlement hs;
-				hs = sqLeader.GetHolderSett();
-				if (hs.IsValid)
-					if (hs.IsTTent)
-						return -19;
 			}
-			if (g.Explored(aiPlayer))
-				if (set.IsValid)
-					if (!set.IsIndependent)
-						if (s.IsValid)
-							if (s.IsStronghold)
-								if (s.IsOwn(aiPlayer))
-									if (!sq.HasFreedom)
-										return -20;//wait to attach before sending
+			// Squads without Hero.
+			else {
+				if (sq.Size < 10) {
+					Settlement hs;
+					hs = sqLeader.GetHolderSett();
+					if (hs.IsValid)
+						if (hs.IsTTent)
+							return -19;
+				}
+				if (g.Explored(aiPlayer))
+					if (set.IsValid)
+						if (!set.IsIndependent)
+							if (s.IsValid)
+								if (s.IsStronghold)
+									if (s.IsOwn(aiPlayer))
+										if (!sq.HasFreedom)
+											return -20;//wait to attach before sending
 		}
 
 	if (gCurDest.GetPriority(aiPlayer) >= g.GetPriority(aiPlayer))
