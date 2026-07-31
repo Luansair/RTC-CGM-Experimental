@@ -1,0 +1,3 @@
+# Copyright
+
+Haemimont Games, RattlesMake, Mediterranevm, I.E.C., Paolo Lamberto
