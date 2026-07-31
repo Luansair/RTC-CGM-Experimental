@@ -474,7 +474,11 @@ while (true) {
 			if (bSqLeaderIsHero &&
 				(nSqState == SS_IDLE || nSqState == SS_Enter || nSqState == SS_Ruins || nSqState == SS_Wait) &&
 				sq.InHolder && bValidSetGkIn) {
-				if (setGkIn.IsStronghold && sqLeader.item_count > 0) {
+				bool bAllGoodItems;
+
+				bAllGoodItems = sqLeader.user < 0;
+
+				if (setGkIn.IsStronghold && sqLeader.item_count > 0 && !bAllGoodItems) {
 					bool tryDrop;
 					int nPosibilities;
 
@@ -560,6 +564,7 @@ while (true) {
 								worstItem = item;
                             }
 						}
+						// Drop worst item
 						if (nWorstScore < nScoreThreshold && worstItem.IsValid) {
 							point exitPt;
 							point offSet;
@@ -571,7 +576,10 @@ while (true) {
 							sqLeader.DropItem(worstItem, sqLeader.pos + offSet);
 							sqLeader.SetUser(GetTime() + 60000);
 							Sleep(100);
-							continue;
+						}
+						// All items are good so don't try to drop ever again. 
+						else if (nWorstScore >= nScoreThreshold && sqLeader.free_item_slots == 0) {
+							sqLeader.SetUser(-5);  // Can be any negative number.
 						}
 					}
 				}
@@ -826,7 +834,7 @@ while (true) {
 						// TAKE ITEMS
 						//==============================
 						// "User" field of Unit class is used to store the time when it drop an item to avoid picking it up again.
-						
+
 						if (bTakeItems && GetTime() > sqLeader.user)
 							if (sq.TakeNearbyItems(sqLeader.sight)) {
 								Sleep(100);
