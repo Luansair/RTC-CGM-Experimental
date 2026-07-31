@@ -477,16 +477,16 @@ while (true) {
 				if (setGkIn.IsStronghold && sqLeader.item_count > 0) {
 					bool tryDrop;
 					int nPosibilities;
-					pr("Seems the hero has items and has nothing to do, lets calculate de drop chance.");
+
 					nPosibilities = (sqLeader.free_item_slots * 20) + 1;
 					tryDrop = rand(nPosibilities) == 0;
-					pr("The drop chance is one in: " + nPosibilities);
+
 					if (tryDrop) {
 						IntArray heroItems;
 						IntArray itemScore;
 						Item worstItem;
 						int nItems, nWorstScore, nScoreThreshold, j, k, l;
-						pr("TryDrop true. Entered drop logic");
+
 						nItems = sqLeader.items_count;
 						nScoreThreshold = 150;
 						nWorstScore = 999999;
@@ -558,28 +558,18 @@ while (true) {
 							if (nTotalScore < nWorstScore) {
                                 nWorstScore = nTotalScore;
 								worstItem = item;
-								pr("Current worst score: " + nWorstScore);
-								pr("Current worst item: " + item.name);
                             }
 						}
 						if (nWorstScore < nScoreThreshold && worstItem.IsValid) {
 							point exitPt;
 							point offSet;
-							pr("Attempt to drop item.");
-							pr("Hero race: " + sqLeader.race + ", level: " + sqLeader.inherentlevel);
 							exitPt = setGkInCentralBuilding.GetExitPoint(sqLeader.pos, false);
-							offSet = Point(300,300);
+							offSet = Point(rand(300) - 150, rand(300) - 150);
 
 							sqLeader.ExitHolder(exitPt);
 							Sleep(100);
-							//sqLeader.AddCommand(true, "move", exitPt + offSet);
-							//Sleep(100);
-							//sqLeader.AddCommand(true, "dropitem", exitPt + offSet);
-							//Sleep(100);
-							pr("After ExitHolder hero position is x=" + sqLeader.pos.x + ", y=" + sqLeader.pos.y);
 							sqLeader.DropItem(worstItem, sqLeader.pos + offSet);
 							sqLeader.SetUser(GetTime() + 60000);
-
 							Sleep(100);
 							continue;
 						}
@@ -835,7 +825,8 @@ while (true) {
 						//==============================
 						// TAKE ITEMS
 						//==============================
-						// User field is used to store the time when it drop an item to avoid picking it up again.
+						// "User" field of Unit class is used to store the time when it drop an item to avoid picking it up again.
+						
 						if (bTakeItems && GetTime() > sqLeader.user)
 							if (sq.TakeNearbyItems(sqLeader.sight)) {
 								Sleep(100);
@@ -845,7 +836,8 @@ while (true) {
 				// =============================
 				// UNIT ATTACHMENT
 				// =============================
-				// attach free units (without upgrades, enchantresses and Britain druids are almost useless in combat)
+				// Attach free units (without upgrades, enchantresses and Britain druids are almost useless in combat)
+
 				if (nSqState != SS_Catapult && nSqState != SS_Train && !sqLeader.HasFreedom && (!sq.TestFlags(SF_PEACEFUL) || sqLeader.AsDruid.IsValid)) {
 					bool bCheck = false;
 					if (!sqLeader.IsHeirOf("IEnchantress")) {
@@ -986,11 +978,13 @@ while (true) {
 			// =============================
 			// POWERFUL SQUAD WITH NO HERO
 			// =============================
+			// Sometimes the AI send good units on their own which is a waste of gold. It's ok in early to explore and get settlements.
+
 			if (!bSqLeaderIsHero && !sqLeader.HasFreedom && !sq.TestFlags(SF_PEACEFUL) &&
 				nSqState != SS_Flee && nSqState != SS_Catapult && nSqState != SS_Train && nSqState != SS_Attach && nSqState != SS_Ruins) {
 				int avgUnitPower;
 				avgUnitPower = sq.Eval / sq.Size;
-				if (avgUnitPower >= 180) {
+				if (avgUnitPower >= 200 && GetTime() >= 1800000) {  // After 30 min retreat good units
 					int nHomeGaikaID;
 					nHomeGaikaID  = EnvReadInt(aiPlayer, "HomeGaika");
 					if (nHomeGaikaID > 0) {
