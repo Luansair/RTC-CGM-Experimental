@@ -4,24 +4,22 @@
 
 int nAssUnderFire;
 bool bAssUnderFire;
-StrArray typeClass;
 
 nAssUnderFire = EnvReadInt(set, "AssUnderFire");//set in ES_Stronghold
 bAssUnderFire = nAssUnderFire > 0;
-
-typeClass.resize(6);
 
 // ======================
 // ARMY BUILD CONDITIONS
 // ======================
 if (!bAssUnderFire)
-	if (set.gold < 800)
+	if (set.gold < 800 || (GetTime() < EnvReadInt(set, "nNextArmyBuildTime")))
 		return;
 
 if (set.population > GetConst("MinPopulation")) {
 	int nRace, nType, nLastResearched, aiPlayer, nMilUnits;
 	bool bBuildArmy, bRaceIsImperialRome = false, bRaceIsPunicRome = false, bRaceIsGreece = false;
 	StrArray imperialOrPunicOrGreekOrGaulTechs, gaulImprovedTechs;
+	IntArray valueUnitType, costUnitType, weightUnitType, uTypeIsRanged;
 
 	nRace = set.GetCentralBuilding().race;
 	// ===============================
@@ -81,11 +79,36 @@ if (set.population > GetConst("MinPopulation")) {
 		gaulImprovedTechs[4] = "Gaul Exceptional Horseshoes";
 		gaulImprovedTechs[5] = "Gaul Fine Armor";
 	}
-	// ===============================
-	// TYPE -> CLASS | MAPPER SETUP
-	// ================================
-	
+	// =======================
+	// UNIT PROPERTIES MAPPER
+	// =======================
+	// Maps the value (arbitrary), the cost and the class (ranged or not) to a number.
+	// These numbers will be used later to calculate the weight.
 
+	valueUnitType.resize(6);
+	costUnitType.resize(6);
+	weightUnitType.resize(6);
+	uTypeIsRanged.resize(6);
+	if (nRace == Britain) {
+		valueUnitType[0] = 8;
+		valueUnitType[1] = 12;
+		valueUnitType[2] = 20;
+		valueUnitType[3] = 20;
+		valueUnitType[4] = 24;
+		valueUnitType[5] = 32;
+
+		costUnitType[0] = 50;
+		costUnitType[1] = 60;
+		costUnitType[2] = 150;
+		costUnitType[3] = 150;
+		costUnitType[4] = 150;
+		costUnitType[5] = 400;
+
+		uTypeIsRanged[1] = 1;
+		uTypeIsRanged[4] = 1;
+	}
+	
+	
 	nType = -1;
 	// ======================================
 	// UNIT RESEARCH CHECK AND TYPE RETRIEVAL
@@ -128,6 +151,7 @@ if (set.population > GetConst("MinPopulation")) {
 		}
 	}
 
+
 	aiPlayer = set.player;
 	nMilUnits = MilUnits(aiPlayer);
 
@@ -159,41 +183,105 @@ if (set.population > GetConst("MinPopulation")) {
 	// ARMY BUILDING
 	// ========================
 	if (bBuildArmy) {
-		int nCount = 10;
+		int nCount = 10, nTotalRecruited, nUnitPickedType, nUnitPickedCounter, nMeleeCount, nRangedCount;
+
+		// ================
+		// PREVIOUS BATCH 
+		// ================
+		nMeleeCount = EnvReadInt(set, "nMeleeCount");
+		nRangedCount = EnvReadInt(set, "nRangedCount"); 
+		nTotalRecruited = nMeleeCount + nRangedCount;
+
+		nUnitPickedCounter = EnvReadInt(set, "nUnitPickedCounter");
+		nUnitPickedType = EnvReadInt(set, "nUnitPickedType") - 1;
+		if (nUnitPickedCounter > 0) {
+			nType = nUnitPickedType;
+			nCount = MIN(10, nUnitPickedCounter);
+		}
 
 		// ========================
 		// UNIT TYPE DECISION
 		// ========================
-		if (nType < 0) {//check which units are desired in case nothing has already been decided previously
+		if (nType < 0) {  //check which units are desired in case nothing has already been decided previously
 			int i;
 			str strTech;
+			// =========================
+			// UNIT WEIGHT CONTEXT SETUP
+			// =========================
+			int nGold, nRoll, nPosibilities, sum, nBestHeroLevel; 
 
-			// Type 5 weight based on gold
-			i = set.gold;
-			if (i >= 5000)//if there is a lot of gold, give higher chance to the heavy unit (5 - RTribune, RPraetorian(Punic), GWomanWarrior, IEliteGuard, BHighlander, EGuardian, HChariot)
-				i = 8;
-			else if (i >= 3000)
-				i = 4;
-			else
-				i = 2;
-			
-			// Type pick. Worst case scenario has 50% + 1/6 chance to pick type 5. Best case has 7/8 + 1/6.
-			if (rand(i) == 0)
-				nType = rand(6);  // Equiprobable
-			else
-				nType = 5;
+			// Economy context
+			nGold = set.gold;
 
-			// After picking a type and depending on race change the type.
-			if (nType == 5)  // 5-HChariot and 5-EGuardian have a chance to be replaced by 4-HHypaspista (50%) or 3-EAnubisWarrior/4-EHorusWarrior (66%)
-				if (bRaceIsGreece) {  
-					if (rand(2) == 0)
-						nType = 4;
+			// Present Hero context
+			nBestHeroLevel = 0;
+			{
+				SquadList SL;
+				set.GetGaika().GetSquads(SL, AI_STAYING, aiPlayer, AI_OWN);
+				SL.Lock();
+				for (; !SL.EOL; SL.Next()) {
+					Hero h;
+					h = SL.Cur.Leader.AsHero();
+					if (h.IsValid)
+						if (h.inherentlevel > nBestHeroLevel) {
+							nBestHeroLevel = h.inherentlevel;
+						}
 				}
-				// Egypt type 5 is not "the best" like other races. It can switch to anubis/horus warriors.
-				else if (nRace == Egypt)
-					if (rand(3) > 0)
-						nType = rand(2) + 3;
+				SL.Unlock();
+			}
 
+			// =========================
+			// UNIT WEIGHT CALCULATION
+			// =========================
+
+			for(i = 0; i <= 5; i += 1) {
+				// Weight influenced by settlement gold
+				if(nGold > costUnitType[i] * 20) 
+					weightUnitType[i] = valueUnitType[i] * 4;
+				else if (nGold > costUnitType[i] * 10) 
+					weightUnitType[i] = valueUnitType[i] * 2;
+				else if (nGold > costUnitType[i] * 5)
+					weightUnitType[i] = valueUnitType[i];
+				else
+					weightUnitType[i] = valueUnitType[i] / 2;
+
+				// Weight influenced by hero level
+				weightUnitType[i] += valueUnitType[i] * nBestHeroLevel / 10;
+
+				// Check which units type should consider
+				if (nRangedCount > nMeleeCount && uTypeIsRanged[i] == 1)
+					weightUnitType[i] = weightUnitType[i] / 2;
+				else if (nMeleeCount > nRangedCount && uTypeIsRanged[i] == 0)
+					weightUnitType[i] = weightUnitType[i] / 2;
+				if (nUnitPickedType == i)
+					weightUnitType[i] = weightUnitType[i] / 2;
+			}
+
+			// Posibilities calculation
+			for(i = 0; i <= 5; i += 1) {
+				nPosibilities += weightUnitType[i];
+			}
+
+			// Nothing to recruit, lets wait...
+			if (nPosibilities <= 0) {
+				EnvWriteInt(set, "nNextArmyBuildTime", GetTime() + 30000 + rand(30001));
+				return;
+			}
+
+			// Roll and type selection
+			nRoll = rand(nPosibilities);
+			for(i = 0; i <= 5; i += 1) {
+				sum += weightUnitType[i];
+				if (sum > nRoll) {
+					nType = i;
+					break;
+				}
+			}
+
+			// We picked a nType. Let's pick an amount.
+			nUnitPickedCounter = 10 + rand(11);
+			nUnitPickedType = nType;
+			
 			// =======================
 			// UNIT TECH PICK
 			// =======================
@@ -232,7 +320,7 @@ if (set.population > GetConst("MinPopulation")) {
 			// =======================
 			// Research the tech for the unit that want to be produced in case it is not researched.
 
-			if (strTech != "")
+			if (strTech != "") {
 				if (!IsResearched(set, strTech)) {
 					int j, k, r;
 					i = EnvReadInt(set, "nArmyTechTime");
@@ -243,125 +331,81 @@ if (set.population > GetConst("MinPopulation")) {
 						EnvWriteInt(set, "nArmyTechTime", i);
 					}
 
-					// Can be researched case.
-					if (GetTime() >= i)
+					// Can be researched?
+					if (GetTime() >= i) {
 						if (set.CanResearch(strTech))
 							if (set.CanAfford(strTech)) {  // using ESH_NeedTech is not good because it might set FreezeArmyBuild
 								int gold, food;
-								if (GetCmdCost(strTech, gold, food)) {  //recruit at least 25-40 units (8-12 in the case of 5-HChariot) of the researched type
+								if (GetCmdCost(strTech, gold, food)) {  //recruit at least 10-20 units (4-8 in the case of 5-HChariot) of the researched type
 									set.SpentGoldOnTech(gold + food / 2);
 									set.Research(strTech);
-									if (bRaceIsGreece)  
-										if (nType == 5)
-											i = rand(5) + 8;
-										else
-											i = rand(16) + 25;
-									else
-										i = rand(16) + 25;
-									EnvWriteInt(set, "nLastResearched", nType + 1);
-									EnvWriteInt(set, "nLastResearchedCounter", i);
 									EnvWriteInt(set, "nArmyTechTime", GetTime() + 120000 + rand(120001));
+									EnvWriteInt(set, "nLastResearchedCounter", nUnitPickedCounter);
+									EnvWriteInt(set, "nLastResearched", nType + 1);
 									return;
 								}
 							}
-
-					// Cannot be researched, change the unit type and select another tech.
-					nType = -1;
-					if (nRace == RepublicanRome) {
-						k = 1;
-						r = 5;
 					}
-					else if (bRaceIsGreece) {  
-						k = 1;
-						r = 5;
-					}
-					else if (nRace == Egypt) {
-						k = 3;
-						r = 2;
-					}
-					else {
-						k = 2;
-						r = 4;
-					}
-					for (i = 0; i < 5; i += 1) {  //  no research is going, choose another advanced unit randomly (max 5 attempts)
-						j = rand(r) + k;  //1-5 or 3-4 or 2-5, depending on the race
-						if (bRaceIsImperialRome) {
-							strTech = imperialOrPunicOrGreekOrGaulTechs[j];
-							if (j == 5)
-								if (rand(3) > 0)
-									strTech = "Improve Praetorian Equipment";
-						}
-						else if (bRaceIsPunicRome)
-							strTech = imperialOrPunicOrGreekOrGaulTechs[j];
-						else if (bRaceIsGreece) {
-							if (j == 5)
-								if (rand(2) == 0)//5-HChariot has a 50% chance to be replaced by 4-HHypaspista
-									j = 4;
-							strTech = imperialOrPunicOrGreekOrGaulTechs[j];
-						}
-						else if (nRace == Gaul) {
-							strTech = imperialOrPunicOrGreekOrGaulTechs[j];
-							if (rand(3) == 0)
-								strTech = gaulImprovedTechs[j];
-						}
-						else
-							strTech = UTech(j, nRace);
-						if (IsResearched(set, strTech)) {  // note that units with 2 researches have reduced chance to be chosen if only the first has been completed
-							nType = j;
-							break;
-						}
-					}
+        			return;
 				}
+			}	
 		}
-
-		// Very small chance to change idea and recruit basic units
-		if (rand(15) == 0) 
-			nType = -1;
-		
-		// =======================
-		// NOTHING CHOSEN
-		// =======================
-		// If nothing has been chosen, recruit basic units (type 0 or 1).
-
-		if (nType < 0)
-			if (rand(2) == 0)
-				nType = 0;
-			else if (nRace == RepublicanRome)
-				if (IsResearched(set, imperialOrPunicOrGreekOrGaulTechs[1]))
-					nType = 1;
-				else
-					nType = 0;
-			else if (bRaceIsGreece)
-				if (IsResearched(set, imperialOrPunicOrGreekOrGaulTechs[1]))
-					nType = 1;
-				else
-					nType = 0;
-			else
-				nType = 1;
-
 		// =======================
 		// CHARIOT UNIT AMOUNT
 		// =======================
 		if (bRaceIsGreece)
 			if (nType == 5)  // In case of 5-HChariot, reduce the amount of units to recruit (4-6 instead of 10) because the cost is very high and they are not attachable to heroes
-				nCount = rand(3) + 4;
+				nCount = rand(3) + 2;
 		
 		// =========================
 		// ENVIRONMENT VARIABLES SET
 		// =========================
+		if (nType >= 0) {
+			
 
-		// For Research
-		if (nType == nLastResearched - 1) {
-			int nLastResearchedCounter;
-			nLastResearchedCounter = EnvReadInt(set, "nLastResearchedCounter");
-			nLastResearchedCounter -= MIN(nCount, nLastResearchedCounter);
-			EnvWriteInt(set, "nLastResearchedCounter", nLastResearchedCounter);
-			if (nLastResearchedCounter <= 0)
-				EnvWriteInt(set, "nLastResearched", 0);
+			if (nType == nLastResearched - 1) {
+				int nLastResearchedCounter;
+				nLastResearchedCounter = EnvReadInt(set, "nLastResearchedCounter");
+				nCount = MIN(nCount, nLastResearchedCounter);
+				nLastResearchedCounter -= MIN(nCount, nLastResearchedCounter);
+				EnvWriteInt(set, "nLastResearchedCounter", nLastResearchedCounter);
+				if (nLastResearchedCounter <= 0)
+					EnvWriteInt(set, "nLastResearched", 0);
+			} else {
+				nUnitPickedCounter -= nCount;
+				EnvWriteInt(set, "nUnitPickedCounter", MAX(0, nUnitPickedCounter));
+				EnvWriteInt(set, "nUnitPickedType", nType + 1);
+			}
+
+			// For Recruitment
+			EnvWriteInt(set, "nBuildType", nType);
+			EnvWriteInt(set, "nBuildCount", nCount);
+
+			if (uTypeIsRanged[nType] == 1)
+				EnvWriteInt(set, "nRangedCount", nRangedCount + nCount);
+			else
+				EnvWriteInt(set, "nMeleeCount", nMeleeCount + nCount);
+
+			if(nTotalRecruited + nCount >= 100 + rand(100)) {
+				int nGameTimeInSec, nGameTimeInMin, nTimeToWait;
+
+				nGameTimeInSec = GetTime() / 1000;
+				nGameTimeInMin = nGameTimeInSec / 60;
+
+				if (set.gold > 8000)
+					nTimeToWait = 0;
+				else if (nGameTimeInMin < 10)
+					nTimeToWait = 10000;
+				else
+					nTimeToWait = 30000;
+
+				EnvWriteInt(set, "nMeleeCount", 0);
+				EnvWriteInt(set, "nRangedCount", 0);
+				EnvWriteInt(set, "nNextArmyBuildTime", GetTime() + nTimeToWait + rand(nTimeToWait));
+			}
 		}
 
-		// For Recruitment
-		EnvWriteInt(set, "nBuildType", nType);
-		EnvWriteInt(set, "nBuildCount", nCount);
-	}
+		
+
+	}  // Endif - bBuildArmy
 }
