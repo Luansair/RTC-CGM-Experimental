@@ -1,34 +1,60 @@
 //void, GAIKA gaika
 
+// This script is executed at GAIKAMONITOR.VS. It is chosen at GETGAIKASTRATEGY.VS. 
+// This script will operate in the designated gaika for a specific player.
+// The script will run as long as the strategy for the gaika remains as GS_KillEnemies.
+// It sends any squad in or approaching the gaika to kill the enemies there.
+
 int aiPlayer, nSleepGS, squadState;
-bool bIsStronghold = false;
+bool bIsStronghold = false, enableLogging = false;
 Settlement set;
 Building hall;
 Squad squad;
 
+// =========
+// SETUP
+// =========
+
 aiPlayer = AIGetPlayer();
 nSleepGS = AIVar(aiPlayer, AIV_Sleep_GS);
 set = gaika.settlement;
+
+// ================
+// STRONGHOLD CHECK
+// =================
+// Checks if the gaika is for a Stronghold and sets the hall (forum) if it is.
+
 if (set.IsValid)
 	if (set.IsStronghold) {
 		bIsStronghold = true;
 		hall = set.GetCentralBuilding();
 	}
 
-//step 1: gather approaching army
+// ==============
+// GATHER ARMY
+// ==============
+// Gather the approaching army together.
+
+// Checks if the settlement is ally. Also checks if there are enemies in the gaika and if there are enough troops to fight them.
 {
 	bool bWait = true;
+
+	// Don't need to wait and gather in an ally settlement
 	if (set.IsValid)
 		if (set.IsAlly(aiPlayer))
 			bWait = false;
+	
 	if (bWait) {
 		int gtStart, own, ally, enemy, enemy_hidden;
+
 		gtStart = GetTime();
-		while (gaika.GetStrat(aiPlayer) == GS_KillEnemies) {
-			gaika.Eval(AI_STAYING, aiPlayer, own, ally, enemy, enemy_hidden);
+
+		// The loop condition calls GETGAIKASTRAT.VS script
+		while (gaika.GetStrat(aiPlayer) == GS_KillEnemies) {  // Internamente llama a GETGAIKASTRAT.VS
+			gaika.Eval(AI_STAYING, aiPlayer, own, ally, enemy, enemy_hidden);  // Metodo puramente interno del motor.
 			if (enemy <= 0)
 				break;
-			if (own + ally >= gaika.MinNeed(aiPlayer, own, ally, enemy))
+			if (own + ally >= gaika.MinNeed(aiPlayer, own, ally, enemy))  // Internamente llama a GETARMYNEED.VS. bMin = true
 				break;
 			bWait = false;
 			{
@@ -154,7 +180,6 @@ if (set.IsValid)
 								state = SS_Enter;
 							else
 								state = SS_IDLE;
-								squad.SendTo(gaika, 1);
 						}
 					}
 					if (bIsStronghold)
@@ -164,6 +189,12 @@ if (set.IsValid)
 									if (set.IsAlly(aiPlayer))
 										state = SS_Enter;
 				}
+
+				if (enableLogging)
+					if (GetTime() >= EnvReadInt(aiPlayer, "logTimer")) {
+						EnvWriteInt(aiPlayer, "logTimer", GetTime() + 500);
+						AppendFile("AI_DEBUG2.log", "KILL t=" + GetTime() + " sq=" + squad.No + " st=" + state + " ally=" + ally + " en=" + enemy + "\n");
+					}
 
 				if (squadState != SS_Flee)
 					if (squadState != SS_Attach)
