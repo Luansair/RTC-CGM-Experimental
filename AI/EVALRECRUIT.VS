@@ -62,6 +62,8 @@ if (!bAssUnderFire) {
 					u = units[ui].AsUnit();
 					if (u.IsAlive && u.inherentlevel < nMaxLevel) {
 						bNeedsTraining = true;
+						EnvWriteInt(sOrigin, "needsTraining", 1);
+						break;
 					}
 				}
 				if (bNeedsTraining && (sq.InHolder || sq.State == SS_IDLE || sq.State == SS_Enter))
