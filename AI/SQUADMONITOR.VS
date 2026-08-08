@@ -8,9 +8,9 @@ Settlement setGkIn, setGkAiDest;
 Building setGkInCentralBuilding;
 point sqPos, setGkAiDestCentralBuildingPos;
 int aiPlayer, nSleepSquadMonitor, nMagePerc, nSqState, min, own, ally, enemy, enemy_hidden, i;
-bool bUseRuins, bSynchApproach, bCoward, bGoAround, bTakeItems, bValidSetGkIn, bSqLeaderIsHero;
-StrArray items;  // All items in the game
-IntArray itemStatValue, itemEffectValue;
+bool bUseRuins, bSynchApproach, bCoward, bGoAround, bTakeItems, bValidSetGkIn, bSqLeaderIsHero, enableLogging;
+StrArray items;
+IntArray itemStatValue, itemEffectValue, sqPrevState, sqPrevGkIn, sqPrevGkDest, sqTimerLog;
 Sleep(500 + rand(1001));
 
 aiPlayer = AIGetPlayer();
@@ -23,16 +23,18 @@ bCoward = AIVar(aiPlayer, AIV_Coward) != 0;
 bGoAround = AIVar(aiPlayer, AIV_GoAround) != 0;
 bTakeItems = AIVar(aiPlayer, AIV_TakeItems) != 0;
 
+enableLogging = false;
+
 // items[ItemIdx] = ItemName	| The idea is to convert from name to int.
 items.resize(40);
 
 // --- CONSUMABLE ITEMS (indices 0-8) ---
 items[0] = "Healing water";             // Heals 2000 HP
 items[1] = "Bag of healing water";      // Heals 4000 HP
-items[2] = "Rye spikes";               // 1000 food
-items[3] = "Healing herbs";            // Full heal + stamina
+items[2] = "Healing herbs";            // Full heal + stamina
+items[3] = "Ash of druid heart";       // Heals owner + 8 allies
 items[4] = "Poison Mushroom";          // +1 level (needs 90% HP)
-items[5] = "Ash of druid heart";       // Heals owner + 8 allies
+items[5] = "Rye spikes";               // 1000 food
 items[6] = "Battle Drums of Rage";     // +30 dmg 10s
 items[7] = "Horn of victory";          // 75 dmg to 15 enemies
 items[8] = "Finger of death";          // Kills 4 enemies
@@ -82,8 +84,8 @@ itemStatValue[13] = 30;
 itemStatValue[14] = 90;
 itemStatValue[15] = 20;
 itemStatValue[16] = 60;
-itemStatValue[17] = 10;
-itemStatValue[18] = 30;
+itemStatValue[17] = 15;
+itemStatValue[18] = 60;
 itemStatValue[19] = 160;
 
 itemStatValue[22] = 60;
@@ -154,6 +156,7 @@ while (true) {
 			sqPos = sq.pos;
 
 			setGkIn = sqGkIn.settlement;
+
 			if (setGkIn.IsValid) {
 				bValidSetGkIn = true;
 				setGkInCentralBuilding = setGkIn.GetCentralBuilding();
@@ -259,9 +262,23 @@ while (true) {
 				if (sqLeader.command == "ai_killall" || sqLeader.command == "idle" || sqLeader.command == "stand_position") {
 					if (setGkAiDest.IsValid)
 						if (!sqLeader.IsVisible) {
+							ObjList units;
+							Unit u;
+							int ui;
+
+							units = sq.Units;
+							for(ui = 0; ui < units.count; ui += 1) {
+								u = units[ui].AsUnit();
+								if(u.IsAlive && !u.IsVisible) {
+									u.SetLastAttackTime();
+									u.SetVisible(true);
+								}
+
+							}
 							sqLeader.SetLastAttackTime();
 							sqLeader.SetVisible(true);
 						}
+						
 					if (sq.StateTime > 20000)
 						if (setGkAiDest.IsValid) {
 							if (setGkAiDestCentralBuildingPos.Dist(sqPos) > 500)
@@ -292,6 +309,55 @@ while (true) {
 			sqLeaderHero = sqLeader.AsHero();
 			bSqLeaderIsHero = sqLeaderHero.IsValid;
 
+			// ===============
+			// LOGGING INFO
+			// ===============
+			if (enableLogging && !sq.TestFlags(SF_PEACEFUL)) {
+				int nHomeGkID;
+				bool logFreeUnits = false;  
+
+				nHomeGkID = EnvReadInt(aiPlayer, "HomeGaika");
+				if(GetTime() < 10000) {
+					AppendFile("AI_HOME.log", "HomeGaika=" + nHomeGkID + "\n");
+				}
+
+				if (GetTime() >= EnvReadInt(aiPlayer, "squadMonitorLogTimer")) {
+					int nInH, nHero, leadHpPerc, sqHpPerc, isVisible, invCount;
+					ObjList units;
+					Unit u;
+					int ui;
+
+					EnvWriteInt(aiPlayer, "squadMonitorLogTimer", GetTime() + 2000 + aiPlayer * 200);
+
+					leadHpPerc = sq.Leader.health * 100 / sq.Leader.maxhealth;
+					sqHpPerc = sq.health * 100 / sq.maxhealth;
+					if (sq.InHolder)
+						nInH = 1;
+					else
+						nInH = 0;
+					if (bSqLeaderIsHero)
+						nHero = 1;
+					else
+						nHero = 0;
+					if (sqLeader.IsVisible)
+						isVisible = 1;
+					else
+						isVisible = 0;
+					
+					units = sq.Units;
+					for(ui = 0; ui < units.count; ui += 1) {
+						u = units[ui].AsUnit();
+						if(u.IsAlive && !u.IsVisible) {
+							invCount += 1;
+						}
+					}
+					AppendFile("Data/useful-info/AI_SQUADMONITOR.log", "SM t=" + GetTime() + " sq=" + i + " sqPercHp=" + sqHpPerc + " sq pos=(" + sq.pos.x + "," + sq.pos.y + ")" + " leaderHero=" + nHero + " sqLeadPercHp=" + leadHpPerc + " state=" + nSqState + 
+								" GkIn=" + sqGkIn.ID + " GkDest=" + sqGkAiDest.ID + " GkInPos=(" + sqGkIn.Center.x + "," + sqGkIn.Center.y + ")"	+ " GkDestPos=(" + sqGkAiDest.Center.x + "," + sqGkAiDest.Center.y + ")" + " StateTime=" + sq.StateTime + 
+								" size=" + sq.Size + " sqEval=" +sq.Eval + " InHolder=" + nInH + " lastFightTime=" + sq.LastFightTime + " cmd=" + sq.Leader.command(0) + " leaderVisible=" + isVisible + " sqInvCount=" + invCount + "\n");
+				}
+			}
+			
+
 			if (sqLeader.command == "idle" || sqLeader.command == "stand_position") {
 				if (nSqState == SS_IDLE || nSqState == SS_Enter)
 					if (sqGkAiDest > 0 && sqGkIn != sqGkAiDest) {
@@ -299,7 +365,7 @@ while (true) {
 						Sleep(100);
 						continue;
 					}
-					else if (sq.Size <= min - 10)//send units from tents and other small armies at home
+					else if (sq.Size <= 10)//send units from tents and other small armies at home
 						if (sq.Eval < 4000)
 							if (sqGkIn.StratRunning(aiPlayer) == GS_NONE || sqGkIn.StratRunning(aiPlayer) == GS_EnterSettlement)
 								if (!sq.TestFlags(SF_PEACEFUL) || sqLeader.AsDruid().IsValid) {
@@ -330,16 +396,6 @@ while (true) {
 											continue;
 										}
 									}
-									else if (!bSqLeaderIsHero)
-										if (!sqLeader.HasFreedom)
-											if (!s.IsStronghold) {
-												s = NearestStronghold(sqPos, sq.Player);
-												if (s.IsValid) {
-													sq.SetCmd(SS_Flee, 0, SF_ADVCHOOSER, "enter", s.GetCentralBuilding());
-													Sleep(100);
-													continue;
-												}
-											}
 								}
 				if (nSqState == SS_IDLE || nSqState == SS_Wait)//retreat idle units from tower/sentry range
 					if (sq.LastFightTime > GetTime() - 3000) {
@@ -489,10 +545,11 @@ while (true) {
 						IntArray heroItems;
 						IntArray itemScore;
 						Item worstItem;
-						int nItems, nWorstScore, nScoreThreshold, j, k, l;
+						int nItems, nWorstScore, nScoreThreshold, j, k, l, nLevel;
 
 						nItems = sqLeader.items_count;
-						nScoreThreshold = 150;
+						nLevel = MIN(50, sqLeader.inherentlevel);
+						nScoreThreshold = 10 * nItems +  nLevel * nLevel / 25;
 						nWorstScore = 999999;
 
 						heroItems.resize(nItems);
@@ -549,8 +606,8 @@ while (true) {
 								otherItemId = heroItems[k] - 1;
 								if (itemId == otherItemId && itemStatValue[itemId] > 0)  // Duplicate of stats dont work.
 									nStatScore = 0;
-								else if (itemId <= 5 && itemId != 4 && otherItemId <= 5 && itemId != 4 &&
-										 itemScore[itemId] <= itemScore[otherItemId])  // Both healing items and this one is worse
+								else if (itemId < 4 && otherItemId < 4 &&
+										itemScore[itemId] <= itemScore[otherItemId])  // Both healing items and this one is worse
 									nEffectScore = nEffectScore / 2;
 								// Endif
 							}
@@ -574,7 +631,7 @@ while (true) {
 							sqLeader.ExitHolder(exitPt);
 							Sleep(100);
 							sqLeader.DropItem(worstItem, sqLeader.pos + offSet);
-							sqLeader.SetUser(GetTime() + 60000);
+							sqLeader.SetUser(GetTime() * 512 + nWorstScore);
 							Sleep(100);
 						}
 						// All items are good so don't try to drop ever again. 
@@ -833,13 +890,115 @@ while (true) {
 						//==============================
 						// TAKE ITEMS
 						//==============================
-						// "User" field of Unit class is used to store the time when it drop an item to avoid picking it up again.
+						// "User" field of Unit class is used to store the time and the value of the item dropped when it drop an item to avoid picking it up again.
 
-						if (bTakeItems && GetTime() > sqLeader.user)
-							if (sq.TakeNearbyItems(sqLeader.sight)) {
-								Sleep(100);
-								continue;
+						if (bTakeItems && sqLeader.free_item_slots > 0) {
+							int pickupTime, threshold;
+							pickupTime = sqLeader.user / 512;  // Use 9 bits for item value, the rest for gameTime.
+							threshold = pickupTime % 512;
+
+							if (GetTime() > pickupTime + 30000) {
+								int j, k, holderDist, minDist, bestItemEval; 
+								ObjList itemHoldersInSight;
+								ItemHolder itemHolder, bestItemHolder;
+								IntArray heroItems, itemScore;
+								Item bestItem;
+
+								minDist = 100000;
+								bestItemEval = -1;
+								itemHoldersInSight = ObjsInRange(sqLeader, "ItemHolder", sqLeader.sight + 20).GetObjList();
+
+								for (j = itemHoldersInSight.count - 1; j >= 0; j -= 1) {
+									itemHolder = itemHoldersInSight[j].AsItemHolder();
+
+									if (!itemHolder.IsValid)
+										continue;
+									if (itemHolder.count <= 0)
+										continue;
+									
+									holderDist = sqLeader.DistTo(itemHolder);
+
+									// ========== ITEM LOOP AND SCORING ==============
+									// Iterates all the items from the Item Holder
+									// Picks the best item for the unit based on unit's items
+									for (k = 0; k < itemHolder.item_count; k += 1) {
+										Item holderItem;
+										int nStatScore, nEffectScore, nTotalScore, heroItemId, holderItemId, m;
+
+										holderItem = itemHolder.GetItem(k+1);
+										if (!holderItem.IsValid)
+											continue;
+
+										holderItemId = items.find(holderItem.name) - 1;
+										if(holderItemId < 0)
+											continue;
+
+										nStatScore = itemStatValue[holderItemId];
+										nEffectScore = itemEffectValue[holderItemId];
+
+										if (holderItem.name == "Gem of Wisdom") {
+											nEffectScore = nEffectScore - sqLeader.inherentlevel * 6;
+										}
+										else if (holderItem.name == "Invigorating dark harp") {
+											Hero sqHero;
+											int nHeroSkill;
+											
+											sqHero = sqLeader.AsHero();
+											nHeroSkill = sqHero.GetSkill(hsAssault) + sqHero.GetSkill(hsBattleCry) + sqHero.GetSkill(hsCharge) + sqHero.GetSkill(hsHealing);
+											if (nHeroSkill > 0) 
+												nEffectScore = itemEffectValue[holderItemId] * nHeroSkill;
+											else
+												nEffectScore = nEffectScore/2;
+										}
+										else if (holderItem.name == "Healing water" || holderItem.name == "Bag of healing water") 
+											nEffectScore = nEffectScore * holderItem.use_count / 500;				
+										else if (holderItem.name == "Rye spikes") 
+											nEffectScore = nEffectScore * holderItem.use_count / 200;							
+										else if (holderItem.name == "Poison mushrooms" && sqLeader.free_item_slots == 0) 
+											nEffectScore = threshold - 1;							
+										else if (holderItem.name == "Healing herbs") 
+											nEffectScore = nEffectScore * sqLeader.maxhealth / 500;							
+										else if (holderItem.name == "Ash of druid heart") 
+											nEffectScore = nEffectScore * holderItem.use_count * sqLeader.maxhealth / 500;							
+										else if (holderItem.name == "Horn of victory") 
+											nEffectScore = nEffectScore * holderItem.use_count;						
+										else if (holderItem.name == "Skull of pain") 
+											nEffectScore = nEffectScore * sqLeader.maxhealth / 1000;
+										// Endif
+
+										for(m = 0; m < sqLeader.item_count; m += 1) {
+											Item heroItem;
+											int heroItemId;
+											bool sameItem;
+
+											heroItem = sqLeader.GetItem(m+1);
+											if (!heroItem.IsValid)
+												continue;
+
+											heroItemId = items.find(heroItem.name) - 1;
+											if (heroItemId < 0)
+												continue;
+											
+											sameItem = heroItemId == holderItemId;
+											if (sameItem)  // Duplicate of stats dont work.
+												nStatScore = 0;
+										}
+
+										nTotalScore = nStatScore + nEffectScore;
+
+										if (nTotalScore > bestItemEval || (nTotalScore == bestItemEval && holderDist < minDist)) {
+											bestItem = holderItem;
+											bestItemHolder = itemHolder;
+											bestItemEval = nTotalScore;
+										}
+									}
+								}
+								// =========== MOVEMENT AND ITEM PICK ============
+								if (bestItemEval > threshold && bestItemHolder.IsValid && bestItem.IsValid) {
+									sqLeader.AddCommand(true, "getitems", bestItemHolder);
+								}
 							}
+						}
 					}
 				// =============================
 				// UNIT ATTACHMENT
@@ -992,7 +1151,7 @@ while (true) {
 				nSqState != SS_Flee && nSqState != SS_Catapult && nSqState != SS_Train && nSqState != SS_Attach && nSqState != SS_Ruins) {
 				int avgUnitPower;
 				avgUnitPower = sq.Eval / sq.Size;
-				if (avgUnitPower >= 200 && GetTime() >= 1800000) {  // After 30 min retreat good units
+				if (avgUnitPower > 120) {  
 					int nHomeGaikaID;
 					nHomeGaikaID  = EnvReadInt(aiPlayer, "HomeGaika");
 					if (nHomeGaikaID > 0) {
@@ -1052,10 +1211,13 @@ while (true) {
 			if (bSqLeaderIsHero)
 				if (bValidSetGkIn)
 					if (setGkIn.IsStronghold) {
-						// Mage Balance
-						int nBalance;
-						nBalance = sq.Count("BaseMage") - sq.Size * nMagePerc / 100;
-						if (nBalance > 0) {
+						// Mage and Ranged Balance
+						int nMageBalance;
+						int nRangeBalance;
+
+						nMageBalance = sq.Count("BaseMage") - sq.Size * nMagePerc / 100;
+						nRangeBalance = sq.Count("Ranged") - sq.Size * 40 / 100;
+						if (nMageBalance > 0 || nRangeBalance > 0) {
 							ObjList sqUnits;
 							Unit u;
 							int j;
@@ -1064,15 +1226,21 @@ while (true) {
 							for (j = sqUnits.count - 1; j >= 0; j -= 1) {//note that i is used in the original script (which vauses wrong loop iterations)
 								u = sqUnits[j].AsUnit();
 								if (u.IsAlive)
-									if (u.IsReligious)
+									if (u.IsReligious && nMageBalance > 0)
 										if (u.hero == sqLeaderHero) {
 											u.DetachFrom(sqLeaderHero);
-											nBalance -= 1;
-											if (nBalance <= 0)
-												break;
+											nMageBalance -= 1;
 										}
+									else if (u.IsRanged && nRangeBalance > 0) {
+										if (u.hero == sqLeaderHero) {
+											u.DetachFrom(sqLeaderHero);
+											nRangeBalance -= 1;
+											pr("Detach Range from Hero, balance: " + nRangeBalance);
+										}
+									}
 							}
 						}
+						
 					}
 			Sleep(48);  		// without this instruction, the game crashes
 		}  						// End of if statement (Squad initial validation)
