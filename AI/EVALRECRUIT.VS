@@ -13,9 +13,61 @@ bAssUnderFire = g.ID == EnvReadInt(aiPlayer, "AssUnderFireGaika");
 // Under attack it uses squads with no exception. Otherwise it looks for squads that are not doing anything relevant.
 if (!bAssUnderFire) {
 	int sqState;
+	Settlement sOrigin;
+
 	sqState = sq.State;
+
 	if (sqState != SS_IDLE && sqState != SS_Approach && sqState != SS_Wait && sqState != SS_ApproachWait && sqState != SS_Enter)
 		return -1;
+	
+	sOrigin = sq.GAIKAIn.settlement;
+	
+	if (sOrigin.IsValid)
+		if (sOrigin.IsOwn(aiPlayer) && sOrigin.IsStronghold) {
+			int nMaxLevel;
+			bool bHasTraining = false;
+
+			if (IsResearched(aiPlayer, "Gaul Training 3") || 
+				IsResearched(aiPlayer, "Special training")) {
+
+				bHasTraining = true;	
+				nMaxLevel = 12;
+			}
+			else if (IsResearched(aiPlayer, "Spartan Training")) {
+				bHasTraining = true;
+				nMaxLevel = 10;
+			}
+			else if (IsResearched(aiPlayer, "Gaul Training 2") || 
+					IsResearched(aiPlayer, "Advanced Training") || 
+					IsResearched(aiPlayer, "Rome Training 2") ||
+					IsResearched(aiPlayer, "Ancestral Knowledge")) {
+				bHasTraining = true;
+				nMaxLevel = 8;
+			}
+			else if (IsResearched(aiPlayer, "Gaul Training 1") ||
+					IsResearched(aiPlayer, "Rome Training 1") ||
+					IsResearched(aiPlayer, "Training")) {
+				bHasTraining = true;
+				nMaxLevel = 4;
+			}
+
+			if (bHasTraining) {
+				bool bNeedsTraining = false;
+				ObjList units;
+				Unit u;
+				int ui;
+
+				units = sq.Units;
+				for (ui = 0; ui < units.count; ui += 1) {
+					u = units[ui].AsUnit();
+					if (u.IsAlive && u.inherentlevel < nMaxLevel) {
+						bNeedsTraining = true;
+					}
+				}
+				if (bNeedsTraining && (sq.InHolder || sq.State == SS_IDLE || sq.State == SS_Enter))
+					return -24;  // Need training
+			}
+		}
 }
 
 // If Squad is already assigned to the desired GAIKA dont eval again.
@@ -60,14 +112,20 @@ if (set.IsValid)
 					return -9;
 				if (set.IsIndependentGuarded)
 					return -10;
+				if (set.IsOutpost)
+					return -23;
 			}
-// After 30 min avoid exploration and sending units to open spaces without a Hero.
-avgUnitPower = sq.Eval / sq.Size;
-if (GetTime() >= 1800000 && avgUnitPower >= 200) {
-    if (!sqLeader.AsHero().IsValid && !sqLeader.HasFreedom) {
-        if (!set.IsValid || !g.Explored(aiPlayer))
-            return -21;
-    }
+
+if (sq.Size > 0)
+	avgUnitPower = sq.Eval / sq.Size;
+if (!sqLeader.AsHero().IsValid && !sqLeader.HasFreedom) {
+	if (avgUnitPower > 120 || sq.Size > 10) {
+		return -21;
+	} 
+	else if (GetTime() < EnvReadInt(g.ID, "nTimerAttemptSendFreeSquad")) {
+		return -22;
+	}
+	EnvWriteInt(g.ID, "nTimerAttemptSendFreeSquad", GetTime() + 30000 + rand(30001));
 }
 
 if (!bAssUnderFire) {
@@ -95,7 +153,7 @@ if (!bAssUnderFire) {
 			return -15;
 	}
 
-	s = sq.GAIKAIn.settlement;  // Settlement where the squad currently is / origin
+	s = sq.GAIKAIn.settlement;  // Settlement where the squad currently is / sOrigin
 
 	if (set.IsValid)
 		if (set.IsVillage)
@@ -121,13 +179,13 @@ if (!bAssUnderFire) {
 					int time, min;
 					time = GetTime() / 60000;
 					if (time < 10)
-						min = 15;
+						min = 30;
 					else if (time < 20)
-						min = 20;
+						min = 44;
 					else if (time < 30)
-						min = 31;
+						min = 46;
 					else if (time < 60)
-						min = 41;
+						min = 48;
 					else
 						min = 50;
 					if (sq.Size < min)
