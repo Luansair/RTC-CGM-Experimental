@@ -107,6 +107,132 @@ if (set.population > GetConst("MinPopulation")) {
 		uTypeIsRanged[1] = 1;
 		uTypeIsRanged[4] = 1;
 	}
+	else if (bRaceIsImperialRome) {
+		valueUnitType[0] = 12;
+		valueUnitType[1] = 12;
+		valueUnitType[2] = 16;
+		valueUnitType[3] = 16;
+		valueUnitType[4] = 12;
+		valueUnitType[5] = 32;
+
+		costUnitType[0] = 100;
+		costUnitType[1] = 80;
+		costUnitType[2] = 120;
+		costUnitType[3] = 160;
+		costUnitType[4] = 150;
+		if (IsResearched(set, "Improve Praetorian Equipment"))
+			costUnitType[5] = 320;
+		else
+			costUnitType[5] = 400;
+
+		uTypeIsRanged[1] = 1;
+		uTypeIsRanged[2] = 1;
+	}
+	else if (nRace == RepublicanRome) {
+		valueUnitType[0] = 12;  // Hastatus
+		valueUnitType[1] = 12;  // Roman Archer
+		valueUnitType[2] = 20;  // Gladiator 
+		valueUnitType[3] = 16;  // Princep 
+		valueUnitType[4] = 12;  // Equite 
+		valueUnitType[5] = 24;  // Triarus
+
+		costUnitType[0] = 100;
+		costUnitType[1] = 80;
+		costUnitType[2] = 200;
+		costUnitType[3] = 160;
+		costUnitType[4] = 150;
+		costUnitType[5] = 300;
+
+		uTypeIsRanged[1] = 1;
+	}
+	else if (bRaceIsPunicRome) {
+		valueUnitType[0] = 12;
+		valueUnitType[1] = 12;
+		valueUnitType[2] = 20;
+		valueUnitType[3] = 16;
+		valueUnitType[4] = 8;
+		valueUnitType[5] = 32;
+
+		costUnitType[0] = 100;
+		costUnitType[1] = 80;
+		costUnitType[2] = 200;
+		costUnitType[3] = 160;
+		costUnitType[4] = 150;
+		costUnitType[5] = 420;
+
+		uTypeIsRanged[1] = 1;
+	}
+	else if (nRace == Egypt) {
+		valueUnitType[0] = 12;
+		valueUnitType[1] = 12;
+		valueUnitType[2] = 20;
+		valueUnitType[3] = 24;
+		valueUnitType[4] = 24;
+		valueUnitType[5] = 24;
+
+		costUnitType[0] = 70;
+		costUnitType[1] = 60;
+		costUnitType[2] = 160;
+		costUnitType[3] = 260;
+		costUnitType[4] = 260;
+		costUnitType[5] = 240;
+
+		uTypeIsRanged[1] = 1;
+		uTypeIsRanged[2] = 1;
+	}
+	else if (nRace == Gaul) {
+		valueUnitType[0] = 4;
+		valueUnitType[1] = 8;
+		valueUnitType[2] = 20;
+		valueUnitType[3] = 16;
+		valueUnitType[4] = 16;
+		valueUnitType[5] = 24;
+
+		costUnitType[0] = 60;
+		costUnitType[1] = 50;
+		costUnitType[2] = 160;
+		costUnitType[3] = 120;
+		costUnitType[4] = 170;
+		costUnitType[5] = 240;
+
+		uTypeIsRanged[1] = 1;
+	}
+	else if (bRaceIsGreece) {
+		valueUnitType[0] = 12;
+		valueUnitType[1] = 12;
+		valueUnitType[2] = 20;
+		valueUnitType[3] = 24;
+		valueUnitType[4] = 28;
+		valueUnitType[5] = 12;
+
+		costUnitType[0] = 80;
+		costUnitType[1] = 70;
+		costUnitType[2] = 180;
+		costUnitType[3] = 220;
+		costUnitType[4] = 320;
+		costUnitType[5] = 450;
+
+		uTypeIsRanged[0] = 1;
+		uTypeIsRanged[1] = 1;
+	}
+	else if (nRace == Iberia) {
+		valueUnitType[0] = 8;
+		valueUnitType[1] = 12;
+		valueUnitType[2] = 16;
+		valueUnitType[3] = 16;
+		valueUnitType[4] = 24;
+		valueUnitType[5] = 28;
+
+		costUnitType[0] = 50;
+		costUnitType[1] = 60;
+		costUnitType[2] = 150;
+		costUnitType[3] = 160;
+		costUnitType[4] = 200;
+		costUnitType[5] = 300;
+
+		uTypeIsRanged[1] = 1;
+		uTypeIsRanged[4] = 1;
+	}
 	
 	
 	nType = -1;
