@@ -70,7 +70,7 @@
 		groupverifier="data/subai/barrack_train_verify.vs"
 		traincommand="yes"
 		key="s"
-		costgold="180"
+		costgold="200"
 		costpop="1"
 		execdelay="16000"
 		rollover="Equip Slinger"
