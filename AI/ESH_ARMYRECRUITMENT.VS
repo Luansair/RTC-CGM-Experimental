@@ -155,11 +155,16 @@ if (!bDesperateDefence) {
 						h = sqLeader.AsHero();
 						if (h.IsValid) {
 							nCount += 1;
-							if (h.army.count < h.maxarmy / 2)
-								if (rand(3) == 0) {
+							if (h.army.count < h.maxarmy) {
+								int missingUnits;
+
+								missingUnits = h.maxarmy - h.army.count;
+								if (rand(h.maxarmy) < missingUnits) {
 									bHireHero = false;
 									break;
 								}
+							}
+								
 						}
 						else if (!sqLeader.HasFreedom)//detached units
 							i += sq.Size;
@@ -170,13 +175,10 @@ if (!bDesperateDefence) {
 		SL.Unlock();
 	}
 
-	if (bHireHero)
-		if (nCount >= 1)
-			if (i < 6)
-				bHireHero = false;
-			else if (HeroArmiesFullPerc(aiPlayer) < 60)
-				bHireHero = false;
-
+	if (bHireHero) 
+		if (i < 30) 
+			bHireHero = false;
+	
 	if (bHireHero) {
 		str cmd;
 		if (nRaceIsImperialRome)
