@@ -427,15 +427,22 @@ while (true) {
 								if (bValidSetGkIn)
 									if (setGkIn.IsStronghold) {
 										Obj ruins;
+										str ruinsPosStr;
+
 										if (nSqState == SS_Ruins)
 											sq.SetState(SS_IDLE);
+
 										ruins = FindRuins(sqPos, 8000, sqLeader.inherentlevel);
 										if (ruins.IsValid) {
-											sqLeaderHero.DetachArmy();
-											sq.SetCmd(SS_Ruins, 0, SF_ADVCHOOSER, "enter", ruins);
-											sqLeader.AddCommand(false, "enter", setGkInCentralBuilding);
-											Sleep(100);
-											continue;
+											ruinsPosStr = "(" + ruins.pos.x + "," + ruins.pos.y + ")";
+											if (EnvReadInt(aiPlayer, "RuinVisitTime_" + ruinsPosStr) + 30000 <= GetTime()) {
+												EnvWriteInt(aiPlayer, "RuinVisitTime_" + ruinsPosStr, GetTime());
+												sqLeaderHero.DetachArmy();
+												sq.SetCmd(SS_Ruins, 0, SF_ADVCHOOSER, "enter", ruins);
+												sqLeader.AddCommand(false, "enter", setGkInCentralBuilding);
+												Sleep(100);
+												continue;
+											}
 										}
 									}
 			// =============================
@@ -1141,36 +1148,6 @@ while (true) {
 						Sleep(100);
 						continue;
 					}
-			}
-			// =============================
-			// POWERFUL SQUAD WITH NO HERO
-			// =============================
-			// Sometimes the AI send good units on their own which is a waste of gold. It's ok in early to explore and get settlements.
-
-			if (!bSqLeaderIsHero && !sqLeader.HasFreedom && !sq.TestFlags(SF_PEACEFUL) &&
-				nSqState != SS_Flee && nSqState != SS_Catapult && nSqState != SS_Train && nSqState != SS_Attach && nSqState != SS_Ruins) {
-				int avgUnitPower;
-				avgUnitPower = sq.Eval / sq.Size;
-				if (avgUnitPower > 120) {  
-					int nHomeGaikaID;
-					nHomeGaikaID  = EnvReadInt(aiPlayer, "HomeGaika");
-					if (nHomeGaikaID > 0) {
-						GAIKA gHome;
-						gHome = GetGAIKA(nHomeGaikaID);
-						if (sqGkIn != gHome) {
-							sq.SetCmd(SS_Flee, 0, SF_ADVCHOOSER, "enter", gHome.settlement.GetCentralBuilding());
-							Sleep(100);
-							continue;
-						}
-						else if (!sq.InHolder && bValidSetGkIn) {
-							if (setGkIn.IsStronghold) {
-								sq.SetCmd(SS_Enter, 0, SF_ADVCHOOSER, "enter", setGkInCentralBuilding);
-								Sleep(100);
-								continue;
-							}
-						}
-					}	
-				}
 			}
 			// =============================
 			// PEACEFUL UNITS
