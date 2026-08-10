@@ -40,11 +40,10 @@ else if (EnvReadString(player, "GovernmentForm") == "Oligarchy") {
 						if (o.HasItem("Emblem of Democracy"))
 							o.RemoveItem("Emblem of Democracy");
 						if (o.free_item_slots > 0)
-							if (o.AsUnit().inherentlevel >= 6)
-								if (!o.IsSentry)
-									if (!o.AsHero().IsValid)
-										if (!o.HasItem("Emblem of Oligarchy"))
-											o.AddItem("Emblem of Oligarchy");
+							if (!o.IsSentry)
+								if (!o.AsHero().IsValid)
+									if (!o.HasItem("Emblem of Oligarchy"))
+										o.AddItem("Emblem of Oligarchy");
 					}
 			}
 		}

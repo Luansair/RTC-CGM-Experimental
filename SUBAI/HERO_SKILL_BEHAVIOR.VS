@@ -204,11 +204,10 @@ if (.IsValid) {
 							}
 				}
 				i = rush_weight;//Rush -> lowest priority because it can be powerful but it is so situational/risky that it can become useless or even harmful
-				if (i > j)
-					if (rand(5) == 0) {
-						cmd_skill = "skill_divine_rush";
-						j = i;
-					}
+				if (i > j) {
+					cmd_skill = "skill_divine_rush";
+					j = i;
+				}
 				break;
 			}
 

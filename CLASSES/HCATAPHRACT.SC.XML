@@ -4,7 +4,7 @@
 	<properties maxhealth="340" />
 	<properties damage="24" armor_slash="14" armor_pierce="14" />
 	<properties speed="130" />
-	<properties unit_specials="Learning, Offensive tactics" />
+	<properties unit_specials="Defense skill, Trample" />
 
 	<properties healthbar_type="3" />
 

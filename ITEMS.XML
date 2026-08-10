@@ -446,9 +446,9 @@
 		name="Charm of Aegle"
 		important="no"
 		cursed="1"
-		description="Adds 10% health.\nIt restores the health of the owner by 2 every second"
+		description="Adds 15% health.\nIt restores the health of the owner by 3 every second"
 		equip_script="file://Data/ItemScripts/charm of aegle.vs">
-		<bonus health_percent="10" />
+		<bonus health_percent="15" />
 	</item>
 	<item id="Faded gem"
 		image="gameres/icons/items/Green Diamond.bmp"

@@ -2,9 +2,9 @@
 
 	<properties race="ImperialRome" />
 	<properties maxhealth="400" />
-	<properties damage="38" armor_slash="10" armor_pierce="10" />
+	<properties damage="34" armor_slash="16" armor_pierce="16" />
 	<properties speed="80" />
-	<properties unit_specials="Combat skill, Defense skill, Life steal" />
+	<properties unit_specials="Defense skill, Life steal" />
 
 	<properties display_name="Hypaspist" display_name_plural="Hypaspists" />
 	<properties icon="gameres/icons/HHypaspista.bmp" />

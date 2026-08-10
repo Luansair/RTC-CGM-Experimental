@@ -317,7 +317,7 @@
 		execdelay="25000"
 		groupverifier="data/subai/research_verify.vs"
 		rollover="Charm of Aegle"
-		description="Makes all warriors receive a Charm of Aegle (+10% health and +2 health regeneration per second) at the first kill"
+		description="Makes all warriors receive a Charm of Aegle (+15% health and +3 health regeneration per second) at the first kill"
 		method="research"
 		researchcommand="yes"
 		param="ReqSet, Olympic Games, default, NamePlr, Charm of Aegle, default">
