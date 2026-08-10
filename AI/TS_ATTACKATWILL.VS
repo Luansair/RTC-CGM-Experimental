@@ -94,7 +94,9 @@ while (ol.count > 0) {
 						Obj ruins;
 						ruins = FindRuins(hall_pos, 4000, u.inherentlevel);
 						if (ruins.IsValid) {
-							u.SetCommand("enter", ruins);
+							Squad sq;
+							sq = u.GetSquad();
+							sq.SetCmd(SS_Ruins, 0, SF_ADVCHOOSER, "enter", ruins);
 							ruin_hero = u;
 							check_ruins = false;
 							continue;
