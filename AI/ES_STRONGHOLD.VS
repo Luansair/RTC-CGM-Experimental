@@ -228,14 +228,16 @@ while (set.player == aiPlayer) {
 	if (set.gold >= nSquanderGoldAmount)
 		set.AIRun("ESH_Druids.vs");
 	else if (!bAssUnderFire)
-		if (set.gold >= 800)
-			if (rand(60) == 0)
+		if (rand(60) == 0)
+			set.AIRun("ESH_Druids.vs");
+		else if (bResearchTrainingComplete) {
+			if (nMilUnits >= 20)
 				set.AIRun("ESH_Druids.vs");
-			else if (bResearchTrainingComplete)
-				if (nMilUnits >= 20)
-					set.AIRun("ESH_Druids.vs");
-			else if (EnvReadInt(set, "needsTraining") == 1)
-				set.AIRun("ESH_Druids.vs");
+		}
+		else if (EnvReadInt(set, "needsTraining") == 1) {
+			set.AIRun("ESH_Druids.vs");
+		}
+			
 
 	//train arena units and research their upgrades
 	if (set.gold >= nSquanderGoldAmount)
