@@ -20,6 +20,10 @@ if (!bAssUnderFire) {
 	if (sqState != SS_IDLE && sqState != SS_Approach && sqState != SS_Wait && sqState != SS_ApproachWait && sqState != SS_Enter)
 		return -1;
 	
+	// ===============
+	// TRAINED SQUADS
+	// ===============
+	// Avoid sending squads that can be trained.
 	sOrigin = sq.GAIKAIn.settlement;
 	
 	if (sOrigin.IsValid)
@@ -52,22 +56,40 @@ if (!bAssUnderFire) {
 			}
 
 			if (bHasTraining) {
-				bool bNeedsTraining = false;
+				bool unitsNeedTraining = false, heroNeedsTraining = false;
 				ObjList units;
 				Unit u;
-				int ui;
+				int ui, sumLvl, count, avgLvl, missingLvls;
 
 				units = sq.Units;
 				for (ui = 0; ui < units.count; ui += 1) {
 					u = units[ui].AsUnit();
-					if (u.IsAlive && u.inherentlevel < nMaxLevel) {
-						bNeedsTraining = true;
-						EnvWriteInt(sOrigin, "needsTraining", 1);
-						break;
+					if (!u.IsAlive)
+						continue;
+
+					if (u.inherentlevel > nMaxLevel)
+						continue;
+
+					if (u.inherentlevel < nMaxLevel) {
+						unitsNeedTraining = true;
+						if (u.AsHero().IsValid)
+							heroNeedsTraining = true;
 					}
+					sumLvl += u.inherentlevel;
+					count += 1;
 				}
-				if (bNeedsTraining && (sq.InHolder || sq.State == SS_IDLE || sq.State == SS_Enter))
-					return -24;  // Need training
+
+				avgLvl = sumLvl / count;
+				missingLvls = nMaxLevel - avgLvl;
+
+				if (sq.InHolder || sq.State == SS_IDLE || sq.State == SS_Enter) {
+					if (unitsNeedTraining && missingLvls > 0 && rand(missingLvls * missingLvls) > 0) {
+						EnvWriteInt(sOrigin, "needsTraining", 1);
+						return -24;  // Units need training
+					}
+					else if (heroNeedsTraining)  // Non negociable
+						return -25;  // Hero needs training
+				}
 			}
 		}
 }
@@ -121,13 +143,13 @@ if (set.IsValid)
 if (sq.Size > 0)
 	avgUnitPower = sq.Eval / sq.Size;
 if (!sqLeader.AsHero().IsValid && !sqLeader.HasFreedom) {
-	if (avgUnitPower > 120 || sq.Size > 10) {
+	if (avgUnitPower > 180 || sq.Size > 10) {
 		return -21;
 	} 
 	else if (GetTime() < EnvReadInt(g.ID, "nTimerAttemptSendFreeSquad")) {
 		return -22;
 	}
-	EnvWriteInt(g.ID, "nTimerAttemptSendFreeSquad", GetTime() + 30000 + rand(30001));
+	EnvWriteInt(g.ID, "nTimerAttemptSendFreeSquad", GetTime() + 10000 + rand(10001));
 }
 
 if (!bAssUnderFire) {

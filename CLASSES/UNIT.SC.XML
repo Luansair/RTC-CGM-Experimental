@@ -48,7 +48,6 @@
 	<method sig="giveitem" vs="data/subai/unit_giveitem.vs" />
 	<method sig="dropitem" vs="data/subai/unit_dropitem.vs" />
 	<method sig="take_nearby_items" vs="data/subai/unit_take_nearby_items.vs" />
-	<method sig="pick_best_nearby_item" vs="data/subai/unit_pick_best_nearby_item.vs" />
 	<method sig="build_catapult" vs="data/subai/unit_build_catapult.vs" />
 	<method sig="standstill" vs="data/subai/unit_standstill.vs" />
 	<method sig="stand_position" vs="data/subai/unit_stand_position.vs" />
