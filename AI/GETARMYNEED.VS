@@ -4,11 +4,9 @@
 // The value returned should be deterministic, so use of rand is not advisable.
 // Unpredictable behaviour should be done outside this script. It doesn't make sense to make this calculation unpredictable.
 // Some values are arbitrary. May change in the future if deem so.
-// Conditions need refining. Building a proper decision tree and translate it into "if else" statements (engine limitations).
 // These calculations are independent of whatever the caller does. It doesn't affect gaika priorities.
 // Exaggerated army needs may result in big armies going to empty spaces or freezing the AI. 
 // This script attempts to cover all scenarios.
-// Not sure if explored and revealed work.
 
 // Parameters:
 //   g        = GAIKA dest (the zone to evaluate)
@@ -89,7 +87,7 @@ if(gaikaHasSettlement) {
 // Exploration mean sending free units or small squads. 
 if (needExplorers) {
 	nMinNeed = 30;
-	nMaxNeed = 250;
+	nMaxNeed = 1250;
 }
 else if (gaikaHasEnemies) {
 	if (anticipateEnemyReinforcements) {
