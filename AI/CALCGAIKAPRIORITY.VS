@@ -1,24 +1,29 @@
 //int, int aiPlayer, GAIKA g
 
-Settlement set;
-int nHomeDist, nAllyHomeDist, nEnemyHomeDist, nActualPerc = 10, nPlayerRace, independentBonus = 0;
+Settlement set, nearSh;
+int nHomeDist, nAllyHomeDist, nEnemyHomeDist, nActualPerc = 10, nPlayerRace;
+int independentBonus = 0, foodNeedBonus, popNeedBonus;
 rect rcMap;
-bool playerCanSellFood, playerRaceIsGreece, playerAllowedGoldProduction, playerAllowedFoodTrade;
+bool playerCanSellFood, playerRaceIsGreece, playerAllowedGoldProduction, playerAllowedFoodTrade, inCrisis;
 
 g.GetDistToPlayers(aiPlayer, nHomeDist, nAllyHomeDist, nEnemyHomeDist);
 
-// I will check in the future for the nearest stronghold amount of food. More food less village prio and more trade outpost prio. Less food does the opposite.
-
+// I may add 3 villages per stronghold. Get number of strongholds and villages. Each missing is +10 prio
 set = g.settlement;
+nearSh = NearestStronghold(g.Center, aiPlayer);
 nPlayerRace = GetPlayerRace(aiPlayer);
 
+foodNeedBonus = (3000 - MIN(2000, nearSh.food)) / 75;
+popNeedBonus = (nearSh.max_population - nearSh.population) * 2 / 5;
+
+inCrisis = nearSh.population < nearSh.max_population / 5 || nearSh.food < 250 || nearSh.gold < 250;
 playerAllowedGoldProduction = AIVar(aiPlayer, AIV_TradeGold) > 0;
 playerAllowedFoodTrade = AIVar(aiPlayer, AIV_TradeFood) > 0;
 playerRaceIsGreece = nPlayerRace == ImperialRome;
 playerCanSellFood = nPlayerRace == Iberia || playerRaceIsGreece || nPlayerRace == Carthage;
 
-// Explore is non-negociable.
-if (!g.Explored(aiPlayer)) {
+// Exploration is a priority unless in crisis.
+if (!g.Explored(aiPlayer) && g.CanExplore(aiPlayer) && !IsWaterLsa(g.LSA) && !inCrisis) {
 	nActualPerc = 100;
 }
 else if (set.IsValid) {
@@ -27,10 +32,15 @@ else if (set.IsValid) {
 		independentBonus = 10;
 	}
 	else if (set.IsVillage) {
-		nActualPerc = 65;
+		nActualPerc = 55;
 		independentBonus = 20;
 
+		nActualPerc += foodNeedBonus + popNeedBonus;
+
 		if (playerCanSellFood)
+			nActualPerc += 10;
+		
+		if (nPlayerRace == Germany)
 			nActualPerc += 10;
 	}
 	else if (set.IsTTent) {

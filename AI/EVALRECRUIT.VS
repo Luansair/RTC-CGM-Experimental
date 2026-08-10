@@ -143,14 +143,19 @@ if (set.IsValid)
 if (sq.Size > 0)
 	avgUnitPower = sq.Eval / sq.Size;
 if (!sqLeader.AsHero().IsValid && !sqLeader.HasFreedom) {
+	int timer;
 	if (avgUnitPower > 180 || sq.Size > 10) {
 		return -21;
 	} 
 	else if (GetTime() < EnvReadInt(g.ID, "nTimerAttemptSendFreeSquad")) {
 		return -22;
 	}
-	EnvWriteInt(g.ID, "nTimerAttemptSendFreeSquad", GetTime() + 10000 + rand(10001));
+	timer = 1000 * sq.Size;
+	EnvWriteInt(g.ID, "nTimerAttemptSendFreeSquad", GetTime() + timer + rand(timer + 1));
 }
+
+//if (sqLeader.IsPeasant())
+//	return -25;  // Don't use peasants
 
 if (!bAssUnderFire) {
 	Settlement s;

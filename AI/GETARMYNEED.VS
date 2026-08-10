@@ -60,7 +60,7 @@ if (enemy <= 0)
 else 
 	gaikaHasEnemies = true;
 
-if (!g.Explored(aiPlayer))
+if (!g.Explored(aiPlayer) && g.CanExplore(aiPlayer) && !IsWaterLsa(g.LSA))
 	needExplorers = true;
 else
 	needExplorers = false;
@@ -74,7 +74,7 @@ if(gaikaHasSettlement) {
 	} else {
 		anticipateEnemyReinforcements  = true;
 		if (settlement.IsEnemy(aiPlayer) && enemy <= 1000)
-			nMaxNeed += 10000;
+			nMaxNeed += 15000;
 	}
 }
 
@@ -86,7 +86,7 @@ if(gaikaHasSettlement) {
 // Exploration has a priority over sending complete armies to unexplored gaikas.
 // Exploration mean sending free units or small squads. 
 if (needExplorers) {
-	nMinNeed = 30;
+	nMinNeed = 1;
 	nMaxNeed = 1250;
 }
 else if (gaikaHasEnemies) {
