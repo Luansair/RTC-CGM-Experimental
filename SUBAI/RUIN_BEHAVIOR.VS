@@ -68,7 +68,7 @@ Sleep(750 + rand(751));
 									}
 							}
 
-							h.SetCommand("move", .GetExitPoint(h, .pos) + Point(10, 80));
+							h.AddCommand(true, "move", .GetExitPoint(h, .pos) + Point(10, 80));
 						}
 				}
 		}
