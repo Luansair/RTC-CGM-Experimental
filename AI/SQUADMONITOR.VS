@@ -766,7 +766,7 @@ while (true) {
 				// =============================
 				if (sq.Eval >= 3000) {//check feeding
 					int needed, food;
-					needed = sq.Size * (sqPos.Dist(sqGkAiDest.Center) + 200) / 700;//add 200 to help feeding already hungry squads
+					needed = sq.Size * 20;
 					if (bSynchApproach)
 						needed = needed * 4 / 3;
 					food = sq.food + sq.FoodComing;
