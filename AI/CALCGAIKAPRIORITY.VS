@@ -16,7 +16,7 @@ nPlayerRace = GetPlayerRace(aiPlayer);
 foodNeedBonus = (3000 - MIN(2000, nearSh.food)) / 75;
 popNeedBonus = (nearSh.max_population - nearSh.population) * 2 / 5;
 
-inCrisis = nearSh.population < nearSh.max_population / 5 || nearSh.food < 250 || nearSh.gold < 250;
+inCrisis = nearSh.population < nearSh.max_population / 5 || nearSh.food < 250;
 playerAllowedGoldProduction = AIVar(aiPlayer, AIV_TradeGold) > 0;
 playerAllowedFoodTrade = AIVar(aiPlayer, AIV_TradeFood) > 0;
 playerRaceIsGreece = nPlayerRace == ImperialRome;
@@ -75,11 +75,16 @@ else if (set.IsValid) {
 		nActualPerc += independentBonus;
 	}
 
-	// More aggressive
 	if (g.Explored(aiPlayer) && set.IsEnemy(aiPlayer)) {
 		nActualPerc += 10;
 		if (g.Revealed(aiPlayer))
 			nActualPerc += 5;
+	}
+	else if (set.IsOwn(aiPlayer)) {
+		nActualPerc += 20;
+	}
+	else if (set.IsAlly(aiPlayer)) {
+		nActualPerc += 5;
 	}
 }
 
