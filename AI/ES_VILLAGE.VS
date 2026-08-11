@@ -38,7 +38,58 @@ while (set.player == aiPlayer) {
 			}
 	}
 	else {
-		stronghold = set.BestToSupply;//it returns the nearest owned stronghold
+		// ========= PICK BEST STRONGHOLD =========
+		ObjList olSh;
+		int i, nMaxDistance, nBestScore;
+		rect rcMap;
+		Settlement bestSh;
+
+		rcMap = GetMapRect();
+		nMaxDistance = Dist(Point(rcMap.left, rcMap.top), Point(rcMap.right, rcMap.bottom));
+		nBestScore = -1000000;
+
+		olSh = GetSettlements("BaseTownhall", aiPlayer);
+
+		for (i = olSh.count - 1; i >= 0; i  -= 1) {
+			Settlement sCandidate;
+			Building candidateBuilding;
+			int nScore, nFoodScore, nPopScore, nDistToVillage, nDistPerc;
+
+			candidateBuilding = olSh[i].AsBuilding();
+			if (!candidateBuilding.IsValid) {
+				continue;
+			}
+			sCandidate = candidateBuilding.settlement;
+			if (!sCandidate.IsValid) {
+				continue;
+			}
+			if (!sCandidate.IsStronghold) {
+				continue;
+			}
+			if (sCandidate.LandLsa() != set.LandLsa()) {
+				continue;
+			}
+			// +10 for each 500 food below 5000. -10 for each 500 food above 8000.
+			nFoodScore = (5000 - MIN(5000, sCandidate.food)) / 50 - (8000 - MAX(8000, sCandidate.food)) / 50;
+
+			// +2 for each missing % of population
+			nPopScore = 200 * (sCandidate.max_population - MIN(sCandidate.max_population, sCandidate.population)) / sCandidate.max_population;
+
+			nDistToVillage = set.GetCentralBuilding().DistTo(candidateBuilding);
+			nDistPerc = nDistToVillage * 100 / nMaxDistance;
+			nScore = (100 + nFoodScore + nPopScore) * (100 - nDistPerc) / 100;
+
+			if (nScore > nBestScore) {
+				nBestScore = nScore;
+				bestSh = sCandidate;
+			}
+		}
+		if (bestSh.IsValid) {
+			stronghold = bestSh;
+		}
+		else {
+			stronghold = set.BestToSupply;  // it returns the nearest owned stronghold
+		}
 		if (stronghold.IsValid) {
 			nDist = hall.DistTo(stronghold.GetCentralBuilding());
 			if (nDist != nBestDist) {
