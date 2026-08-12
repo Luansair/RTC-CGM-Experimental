@@ -105,10 +105,25 @@ while (set.player == aiPlayer) {
 
 					if (set.population >= set.max_population)
 						bCanDrain = true;
-					else if (nRectLongestSide > 0)//see original script for reference (it considers stronghold/village food/population weight)
-						if (MIN(100, stronghold.food * 100 / MAX(300, MilUnits(aiPlayer) * 20 / Strongholds(aiPlayer))) - stronghold.population * 100 / stronghold.max_population
-								>= 60 - nDist * 100 / nRectLongestSide - set.population * 100 / set.max_population / 2)
+					else if (nRectLongestSide > 0) {
+						int nShPopPerc, nVillPopPerc, nDistPerc, nPopNeed, nDrainChance, nExtraShPop, nShFoodPerc, nFoodNeed;
+
+						nShPopPerc =  stronghold.population * 100 / stronghold.max_population;
+						nShFoodPerc = stronghold.food * 100 / 5000;
+						nVillPopPerc = set.population * 100 / set.max_population;
+						nDistPerc = nDist * 100 / nRectLongestSide;
+						nExtraShPop = MIN(50, (MAX(5000, stronghold.food) - 5000) / 25);
+
+						nPopNeed = MAX(0, 100 + nExtraShPop - nShPopPerc);
+						nFoodNeed = 100 - nShFoodPerc;
+
+						nDrainChance = nPopNeed * 2 + nVillPopPerc * 2 / 3 + nDistPerc * 2 - nFoodNeed * 2 / 3;
+
+						if (nDrainChance > rand(250)) {
 							bCanDrain = true;
+						}
+					}
+						
 
 					if (bCanDrain) {
 						if (bUseForts) {
