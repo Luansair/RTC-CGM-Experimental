@@ -504,7 +504,7 @@ if (nRace == Egypt)
 	}
 
 //simple commands - buy slaves (Greece and Egypt) | IMPORTANT: this part must stay between "hecatomb and slavery investment" and "add population"
-if (rand(5) == 0) {
+if (rand(4) == 0) {
 	str cmd;
 	if (nRace == ImperialRome) {
 		if (strTech == "")
@@ -515,7 +515,7 @@ if (rand(5) == 0) {
 			cmd = "BuySlaves";
 	}
 	if (cmd != "")
-		if (set.population <= set.max_population - 15)
+		if (set.population <= set.max_population - 30)
 			if (set.CanAfford(cmd)) {
 				Building b;
 				b = set.FindResearchLab(cmd);
@@ -538,9 +538,13 @@ if (rand(5) == 0) {
 if (rand(2) == 0)
 	if (nRace != Egypt) {
 		str cmd;
-		if (nRace == ImperialRome) {//Greece
-			if (bEgyptGreeceSlaves)
-				cmd = "HAddPop";
+		if (nRace == ImperialRome) { //Greece
+			if (bEgyptGreeceSlaves) {
+				if (set.food > 8000 && set.population < set.max_population * 3 / 10)
+					cmd = "HAddPop";
+				else if (set.food > 12000 && set.population < set.max_population / 2)
+					cmd = "HAddPop";
+			}
 		}
 		else if (nRace == Carthage) {
 			if (nAssUnderFire <= 0)
@@ -557,10 +561,11 @@ if (rand(2) == 0)
 				b = set.FindResearchLab(cmd);
 				if (b.IsValid)
 					if (!b.IsBroken) {
-						int i;
+						int i, extraPop;
 						i = b.CmdCount(cmd);
+						extraPop = (8000 - MAX(8000, set.food)) / 50;
 						if (i < 2)
-							if (set.population + i * 10 <= set.max_population - 5) {
+							if (set.population + i * 10 <= set.max_population - 5 + extraPop) {
 								int gold, food;
 								if (GetCmdCost(cmd, gold, food))
 									if (set.food - food >= MIN(1200, EnvReadInt(set, "nFoodReserve") / 2)) {
