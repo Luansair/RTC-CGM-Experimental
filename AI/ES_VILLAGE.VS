@@ -106,18 +106,19 @@ while (set.player == aiPlayer) {
 					if (set.population >= set.max_population)
 						bCanDrain = true;
 					else if (nRectLongestSide > 0) {
-						int nShPopPerc, nVillPopPerc, nDistPerc, nPopNeed, nDrainChance, nExtraShPop, nShFoodPerc, nFoodNeed;
+						int nShPopPerc, nVillPopPerc, nDistPerc, nPopNeed, nDrainChance, nExtraShPop, nShFoodPerc, nFoodNeed, nMissingVillPopPerc;
 
 						nShPopPerc =  stronghold.population * 100 / stronghold.max_population;
 						nShFoodPerc = stronghold.food * 100 / 5000;
 						nVillPopPerc = set.population * 100 / set.max_population;
+						nMissingVillPopPerc = 100 - nVillPopPerc;
 						nDistPerc = nDist * 100 / nRectLongestSide;
-						nExtraShPop = MIN(50, (MAX(5000, stronghold.food) - 5000) / 25);
+						nExtraShPop = MIN(40, (MAX(8000, stronghold.food) - 8000) / 50);
 
-						nPopNeed = MAX(0, 100 + nExtraShPop - nShPopPerc);
+						nPopNeed = MAX(0, 90 + nExtraShPop - nShPopPerc);
 						nFoodNeed = 100 - nShFoodPerc;
 
-						nDrainChance = nPopNeed * 2 + nVillPopPerc * 2 / 3 + nDistPerc * 2 - nFoodNeed * 2 / 3;
+						nDrainChance = nPopNeed * 2 + nVillPopPerc * 2 / 3 + nDistPerc * 2 - nFoodNeed * 3 / 2 - nMissingVillPopPerc * 1 / 3;
 
 						if (nDrainChance > rand(250)) {
 							bCanDrain = true;
