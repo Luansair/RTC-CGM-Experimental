@@ -1,8 +1,6 @@
 //int, GAIKA g, int aiPlayer, bool bMin, int own, int ally, int enemy
 
 // Given the parameters, this script returns the army needed for a gaika for the AI player.
-// The value returned should be deterministic, so use of rand is not advisable.
-// Unpredictable behaviour should be done outside this script. It doesn't make sense to make this calculation unpredictable.
 // Some values are arbitrary. May change in the future if deem so.
 // These calculations are independent of whatever the caller does. It doesn't affect gaika priorities.
 // Exaggerated army needs may result in big armies going to empty spaces or freezing the AI. 
@@ -72,9 +70,14 @@ if(gaikaHasSettlement) {
 			needExplorers = true;
 		}
 	} else {
-		anticipateEnemyReinforcements  = true;
-		if (settlement.IsEnemy(aiPlayer) && enemy <= 1000)
+		if (settlement.IsStronghold) {
+			nMinNeed += 5000;
+			anticipateEnemyReinforcements  = true;
+		}
+		if (settlement.IsEnemy(aiPlayer) && enemy <= 1000) {
+			nMinNeed += 4000;
 			nMaxNeed += 15000;
+		}
 	}
 }
 
