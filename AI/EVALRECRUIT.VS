@@ -3,12 +3,17 @@
 // This script evaluates the squad to send to support gaikas that need reinforcements
 GAIKA gCurDest;
 Unit sqLeader;
-Settlement set;
+Settlement set, sqSet;
 int aiPlayer, lsaPathLen, nEval, avgUnitPower;
-bool bAssUnderFire;
+bool bAssUnderFire, sqInSh = false;
 
 aiPlayer = sq.Player;
 bAssUnderFire = g.ID == EnvReadInt(aiPlayer, "AssUnderFireGaika");
+
+sqSet = sq.GAIKAIn.settlement;
+if (sqSet.IsValid)
+	if (sqSet.IsOwn(aiPlayer) && sqSet.IsStronghold)
+		sqInSh = true;
 
 // Under attack it uses squads with no exception. Otherwise it looks for squads that are not doing anything relevant.
 if (!bAssUnderFire) {
@@ -142,15 +147,15 @@ if (set.IsValid)
 
 if (sq.Size > 0)
 	avgUnitPower = sq.Eval / sq.Size;
-if (!sqLeader.AsHero().IsValid && !sqLeader.HasFreedom) {
+if (!sqLeader.AsHero().IsValid && !sqLeader.HasFreedom && sqInSh) {
 	int timer;
-	if (avgUnitPower > 180 || sq.Size > 10) {
+	if (avgUnitPower > 400) {
 		return -21;
 	} 
 	else if (GetTime() < EnvReadInt(g.ID, "nTimerAttemptSendFreeSquad")) {
 		return -22;
 	}
-	timer = 1000 * sq.Size;
+	timer = 10 * sq.Eval;
 	EnvWriteInt(g.ID, "nTimerAttemptSendFreeSquad", GetTime() + timer + rand(timer + 1));
 }
 
@@ -215,8 +220,8 @@ if (!bAssUnderFire) {
 						min = 46;
 					else if (time < 60)
 						min = 48;
-					else
-						min = 50;
+					else 
+						min = sqLeader.AsHero.maxarmy;
 					if (sq.Size < min)
 						return -16;
 				}
