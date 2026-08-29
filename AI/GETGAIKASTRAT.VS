@@ -62,57 +62,26 @@ if (nOwn > 0) {
 				if (nOwn + nAlly > nEnemy * 2) {
 					int nOwnSt, nAllySt, nEnemySt, nEnemyHiddenSt;
 					gaika.Count(AI_STAYING, aiPlayer, nOwnSt, nAllySt, nEnemySt, nEnemyHiddenSt);
-					if (nOwnSt + nAllySt > 10)
+					if (nOwnSt + nAllySt - nEnemySt > 10)
 						return GS_Capture;
 				}
 				else if (nEnemy > 30000)
 					if (nOwn + nAlly > nEnemy) {
 						int nOwnSt, nAllySt, nEnemySt, nEnemyHiddenSt;
 						gaika.Count(AI_STAYING, aiPlayer, nOwnSt, nAllySt, nEnemySt, nEnemyHiddenSt);
-						if (nOwnSt + nAllySt > 10)
+						if (nOwnSt + nAllySt - nEnemySt > 10)
 							return GS_Capture;
 					}
 				return GS_NONE;
 			}
 
 	if (bEnemyArmy) {
-		if (!bEnemySet)
-			if (nOwn + nAlly >= nEnemy * 10) {
-				return GS_Guard;
-			}
-			else if (nOwn + nAlly >= nEnemy) {
-				return GS_KillEnemies;
-			}
-			else if (nOwn + nAlly >= nEnemy * 4 / 5) {
-				if (rand(3) == 0)
-					return GS_KillEnemies;
-			}
-			else if (nOwn + nAlly >= nEnemy * 3 / 5) {
-				if (rand(6) == 0)
-					return GS_KillEnemies;
-			}
-			else if (nOwn + nAlly >= nEnemy * 2 / 5) {
-				if (rand(15) == 0)
-					return GS_KillEnemies;
-			} else if (rand(80) == 0)
-				return GS_KillEnemies;
-		if (bCanEnter)
-			if (nOwn + nAlly >= nEnemy) {
-				return GS_KillEnemies;
-			}
-			else if (nOwn + nAlly >= nEnemy * 4 / 5) {
-				if (rand(3) == 0)
-					return GS_KillEnemies;
-			}
-			else if (nOwn + nAlly >= nEnemy * 3 / 5) {
-				if (rand(6) == 0)
-					return GS_KillEnemies;
-			}
-			else if (nOwn + nAlly >= nEnemy * 2 / 5) {
-				if (rand(15) == 0)
-					return GS_KillEnemies;
-			} else if (rand(80) == 0)
-				return GS_KillEnemies;
+		if (!bEnemySet) {
+			return GS_KillEnemies;
+		}
+		if (bCanEnter) {
+			return GS_KillEnemies;
+		}
 	}
 
 	if (bEnemySet)
