@@ -175,10 +175,13 @@ if (!bDesperateDefence) {
 		SL.Unlock();
 	}
 
-	if (bHireHero) 
-		if (i < 30) 
+	if (bHireHero) {
+		if (i < 30) {
 			bHireHero = false;
-	
+			if (GetTime() < 5 * 60 * 1000 && nCount < 1) bHireHero = true;
+		}	
+	}
+
 	if (bHireHero) {
 		str cmd;
 		if (nRaceIsImperialRome)
