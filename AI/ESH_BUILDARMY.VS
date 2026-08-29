@@ -2,21 +2,42 @@
 
 //called from ES_Stronghold, this script sets "nBuildType" and "nBuildCount" in the settlement environment (Rome, Gaul, Iberia, Britain, Egypt and Greece)
 
-int nAssUnderFire;
+int nAssUnderFire, nMissingFoodPerc, nMissingPopPerc, nOdds, nMilUnits;
 bool bAssUnderFire;
 
 nAssUnderFire = EnvReadInt(set, "AssUnderFire");//set in ES_Stronghold
 bAssUnderFire = nAssUnderFire > 0;
 
+
 // ======================
 // ARMY BUILD CONDITIONS
 // ======================
-if (!bAssUnderFire)
-	if (set.gold < 800 || (GetTime() < EnvReadInt(set, "nNextArmyBuildTime")))
+if (!bAssUnderFire) {
+	if (set.gold < 100) {
 		return;
+	}
+	if (GetTime() < EnvReadInt(set, "nNextArmyBuildTime")) {
+		return;
+	}
+	else {
+		nMilUnits = MilUnits(set.player);
+		nMissingFoodPerc = (1000 - set.food) * 100  / 1000;
+		nMissingPopPerc = 100 - set.population * 120 / set.max_population;
+		nOdds = 1200 - nMissingFoodPerc * 6 - nMissingPopPerc * 4 + (100 - nMilUnits) * 3 / 2;
+		if (rand(1200) > nOdds) {
+			if (GetTime() < 10 * 60 * 1000 && nMilUnits < 10) {  // Recruit some basic units to explore early
+				EnvWriteInt(set, "nBuildType", 0);
+				EnvWriteInt(set, "nBuildCount", 10);
+			}
+			EnvWriteInt(set, "nNextArmyBuildTime", GetTime() + 20000);
+			return;
+		}
+	}
+}
+
 
 if (set.population > GetConst("MinPopulation")) {
-	int nRace, nType, nLastResearched, aiPlayer, nMilUnits;
+	int nRace, nType, nLastResearched, aiPlayer;
 	bool bBuildArmy, bRaceIsImperialRome = false, bRaceIsPunicRome = false, bRaceIsGreece = false;
 	StrArray imperialOrPunicOrGreekOrGaulTechs, gaulImprovedTechs;
 	IntArray valueUnitType, costUnitType, weightUnitType, uTypeIsRanged;
@@ -90,7 +111,7 @@ if (set.population > GetConst("MinPopulation")) {
 	weightUnitType.resize(6);
 	uTypeIsRanged.resize(6);
 	if (nRace == Britain) {
-		valueUnitType[0] = 8;
+		valueUnitType[0] = 4;
 		valueUnitType[1] = 12;
 		valueUnitType[2] = 20;
 		valueUnitType[3] = 20;
@@ -113,7 +134,7 @@ if (set.population > GetConst("MinPopulation")) {
 		valueUnitType[2] = 16;
 		valueUnitType[3] = 16;
 		valueUnitType[4] = 12;
-		valueUnitType[5] = 32;
+		valueUnitType[5] = 36;
 
 		costUnitType[0] = 100;
 		costUnitType[1] = 80;
@@ -134,7 +155,7 @@ if (set.population > GetConst("MinPopulation")) {
 		valueUnitType[2] = 20;  // Gladiator 
 		valueUnitType[3] = 16;  // Princep 
 		valueUnitType[4] = 12;  // Equite 
-		valueUnitType[5] = 24;  // Triarus
+		valueUnitType[5] = 32;  // Triarus
 
 		costUnitType[0] = 100;
 		costUnitType[1] = 80;
@@ -150,7 +171,7 @@ if (set.population > GetConst("MinPopulation")) {
 		valueUnitType[1] = 12;
 		valueUnitType[2] = 20;
 		valueUnitType[3] = 16;
-		valueUnitType[4] = 8;
+		valueUnitType[4] = 12;
 		valueUnitType[5] = 32;
 
 		costUnitType[0] = 100;
@@ -164,10 +185,10 @@ if (set.population > GetConst("MinPopulation")) {
 	}
 	else if (nRace == Egypt) {
 		valueUnitType[0] = 12;
-		valueUnitType[1] = 12;
-		valueUnitType[2] = 20;
-		valueUnitType[3] = 24;
-		valueUnitType[4] = 24;
+		valueUnitType[1] = 16;
+		valueUnitType[2] = 24;
+		valueUnitType[3] = 32;
+		valueUnitType[4] = 32;
 		valueUnitType[5] = 24;
 
 		costUnitType[0] = 70;
@@ -202,7 +223,7 @@ if (set.population > GetConst("MinPopulation")) {
 		valueUnitType[1] = 12;
 		valueUnitType[2] = 20;
 		valueUnitType[3] = 24;
-		valueUnitType[4] = 28;
+		valueUnitType[4] = 32;
 		valueUnitType[5] = 12;
 
 		costUnitType[0] = 80;
@@ -220,8 +241,8 @@ if (set.population > GetConst("MinPopulation")) {
 		valueUnitType[1] = 12;
 		valueUnitType[2] = 16;
 		valueUnitType[3] = 16;
-		valueUnitType[4] = 24;
-		valueUnitType[5] = 28;
+		valueUnitType[4] = 28;
+		valueUnitType[5] = 32;
 
 		costUnitType[0] = 50;
 		costUnitType[1] = 60;
@@ -236,6 +257,7 @@ if (set.population > GetConst("MinPopulation")) {
 	
 	
 	nType = -1;
+
 	// ======================================
 	// UNIT RESEARCH CHECK AND TYPE RETRIEVAL
 	// ======================================
@@ -330,57 +352,139 @@ if (set.population > GetConst("MinPopulation")) {
 		// ========================
 		if (nType < 0) {  //check which units are desired in case nothing has already been decided previously
 			int i;
-			str strTech;
+			str strTech, unitTech; 
+			IntArray isResearched, poor, middle, rich;
 			// =========================
 			// UNIT WEIGHT CONTEXT SETUP
 			// =========================
-			int nGold, nRoll, nPosibilities, sum, nBestHeroLevel; 
-
+			int nGold, nRoll, nPosibilities, sum, nBestHeroLevel, nMaxCost, nMaxValue; 
+			int nPoorSum, nMiddleSum, nRichSum, nGoldContext, nMilContext, nHeroContext, nContext, nPoorMix, nMiddleMix, nRichMix;
+			int nRangedUnits, nTotal, nRangedUnitsPerc, nRangedFactor, nMeleeFactor;
 			// Economy context
 			nGold = set.gold;
+			nGoldContext = Int(sqrt(CLAMP((nGold - 800) * 100 / 3200, 0, 100)) * 10);
 
-			// Present Hero context
+			// Present Hero and free units context
 			nBestHeroLevel = 0;
 			{
 				SquadList SL;
 				set.GetGaika().GetSquads(SL, AI_STAYING, aiPlayer, AI_OWN);
 				SL.Lock();
 				for (; !SL.EOL; SL.Next()) {
+					Squad sq;
 					Hero h;
-					h = SL.Cur.Leader.AsHero();
-					if (h.IsValid)
+
+					sq = SL.Cur;
+					h = sq.Leader.AsHero();
+					if (h.IsValid) {
 						if (h.inherentlevel > nBestHeroLevel) {
 							nBestHeroLevel = h.inherentlevel;
 						}
+					}
+					if (!sq.Leader.HasFreedom()) {
+						nRangedUnits += sq.Count("Ranged");
+						nTotal += sq.Size;
+					}
+					
 				}
 				SL.Unlock();
+			}
+			if (nTotal > 0) nRangedUnitsPerc = CLAMP(nRangedUnits * 100 / nTotal, 0, 100); 
+			if (nRangedUnitsPerc > 80) {
+				nRangedFactor = 100 - nRangedUnitsPerc;
+				nMeleeFactor = 100 + nRangedUnitsPerc;
+			}
+			else if (nRangedUnitsPerc > 50) {
+				nRangedFactor = 100 - (nRangedUnitsPerc - 50) / 2;
+				nMeleeFactor = 100 + (nRangedUnitsPerc - 50) / 2;
+			}
+			else {
+				nMeleeFactor = 100 - (50 - nRangedUnitsPerc) / 2;
+				nRangedFactor = 100 + (50 - nRangedUnitsPerc) / 2;
+			}
+			nHeroContext = CLAMP(nBestHeroLevel * 100 / 60, 0, 100);
+			nMilContext = CLAMP(nMilUnits * 100 / 250, 0, 100);
+
+			// Research context
+			isResearched.resize(6);
+			for (i = 0; i <= 5; i += 1) {
+				if (bRaceIsImperialRome || bRaceIsPunicRome || bRaceIsGreece || nRace == Gaul)
+					unitTech = imperialOrPunicOrGreekOrGaulTechs[i];
+				else
+					unitTech = UTech(i, nRace);
+
+				if (unitTech == "") isResearched[i] = 1;
+				else if (IsResearched(set, unitTech)) isResearched[i] = 1;
+			}
+			
+			// Initialize profiles
+			for (i = 0; i <= 5; i += 1) {
+				if (costUnitType[i] > nMaxCost) {
+					nMaxCost = costUnitType[i];
+				}
+				if (valueUnitType[i] > nMaxValue) {
+					nMaxValue = valueUnitType[i];
+				}
+			}
+
+			poor.resize(6); middle.resize(6); rich.resize(6);
+			for (i = 0; i <= 5; i += 1){ 
+				int quality, middleStrength;
+
+				if (nMaxValue > 0 && nMaxCost > 0)
+					quality = valueUnitType[i] * 60 / nMaxValue + costUnitType[i] * 40 / nMaxCost;
+				middleStrength = quality * (100 - quality);
+
+				if (costUnitType[i] > 0 || valueUnitType[i] > 0)
+					poor[i] = nMaxCost * 100 / costUnitType[i] + valueUnitType[i] * 2;
+
+				middle[i] = MAX(1, middleStrength * middleStrength);
+
+				if (nMaxCost > 0)
+					rich[i] = valueUnitType[i] * valueUnitType[i] * (100 + costUnitType[i] * 100 / nMaxCost);
+				
+				nPoorSum += poor[i];
+				nMiddleSum += middle[i];
+				nRichSum += rich[i];
+			}
+			// Normalize profiles
+			for (i = 0; i <= 5; i += 1) {
+				poor[i] = poor[i] * 6000 / nPoorSum;
+				middle[i] = middle[i] * 6000 / nMiddleSum;
+				rich[i] = rich[i] * 6000 / nRichSum;
+			}
+
+			nContext =  nMilContext * 70 / 100 + nHeroContext * 30 / 100;
+
+			// Interpolate profiles
+			nPoorMix = 100 - nGoldContext;
+			nMiddleMix = nGoldContext;
+			nRichMix = nContext * (50 + nGoldContext / 2) / 100;
+			
+			{
+				int nFromMiddle;
+				nFromMiddle = MIN(nRichMix, nMiddleMix);
+				nMiddleMix -= nFromMiddle;
+				nPoorMix -= nRichMix - nFromMiddle;
 			}
 
 			// =========================
 			// UNIT WEIGHT CALCULATION
 			// =========================
-
+			// Agregar cant de tropas del jugador (mayor cantidad mas peso a unidades caras)
+			
 			for(i = 0; i <= 5; i += 1) {
-				// Weight influenced by settlement gold
-				if(nGold > costUnitType[i] * 20) 
-					weightUnitType[i] = valueUnitType[i] * 4;
-				else if (nGold > costUnitType[i] * 10) 
-					weightUnitType[i] = valueUnitType[i] * 2;
-				else if (nGold > costUnitType[i] * 5)
-					weightUnitType[i] = valueUnitType[i];
-				else
-					weightUnitType[i] = valueUnitType[i] / 2;
-
-				// Weight influenced by hero level
-				weightUnitType[i] += valueUnitType[i] * nBestHeroLevel / 10;
+				weightUnitType[i] = poor[i] * nPoorMix / 100 + middle[i] * nMiddleMix / 100 + rich[i] * nRichMix / 100;
 
 				// Check which units type should consider
-				if (nRangedCount > nMeleeCount && uTypeIsRanged[i] == 1)
-					weightUnitType[i] = weightUnitType[i] / 2;
-				else if (nMeleeCount > nRangedCount && uTypeIsRanged[i] == 0)
-					weightUnitType[i] = weightUnitType[i] / 2;
-				if (nUnitPickedType == i)
-					weightUnitType[i] = weightUnitType[i] / 2;
+				if (uTypeIsRanged[i] == 1)
+					weightUnitType[i] = weightUnitType[i] * nRangedFactor / 100;
+				else
+					weightUnitType[i] = weightUnitType[i] * nMeleeFactor / 100;
+
+				// Weight influenced by unit research
+				if (isResearched[i] == 1)
+					weightUnitType[i] = weightUnitType[i] * (110 + nContext * 40 / 100) / 100;
 			}
 
 			// Posibilities calculation
@@ -405,7 +509,7 @@ if (set.population > GetConst("MinPopulation")) {
 			}
 
 			// We picked a nType. Let's pick an amount.
-			nUnitPickedCounter = 10 + rand(11);
+			nUnitPickedCounter = 20;
 			nUnitPickedType = nType;
 			
 			// =======================
@@ -512,7 +616,7 @@ if (set.population > GetConst("MinPopulation")) {
 			else
 				EnvWriteInt(set, "nMeleeCount", nMeleeCount + nCount);
 
-			if(nTotalRecruited + nCount >= 100 + rand(100)) {
+			if(nTotalRecruited + nCount >= 100 + rand(50)) {
 				int nGameTimeInSec, nGameTimeInMin, nTimeToWait;
 
 				nGameTimeInSec = GetTime() / 1000;
@@ -521,13 +625,13 @@ if (set.population > GetConst("MinPopulation")) {
 				if (set.gold > 8000)
 					nTimeToWait = 0;
 				else if (nGameTimeInMin < 10)
-					nTimeToWait = 10000;
-				else
-					nTimeToWait = 30000;
+					nTimeToWait = 5000;
+				else 
+					nTimeToWait = 1000 * Int(sqrt(nMilUnits * nMilUnits * nMilUnits)) / 20;
 
 				EnvWriteInt(set, "nMeleeCount", 0);
 				EnvWriteInt(set, "nRangedCount", 0);
-				EnvWriteInt(set, "nNextArmyBuildTime", GetTime() + nTimeToWait + rand(nTimeToWait));
+				EnvWriteInt(set, "nNextArmyBuildTime", GetTime() + nTimeToWait + rand(nTimeToWait / 2));
 			}
 		}
 
