@@ -2,9 +2,9 @@
 
 	<properties race="Carthage" />
 	<properties maxhealth="360" />
-	<properties damage="24" armor_slash="6" armor_pierce="6" />
+	<properties damage="24" armor_slash="4" armor_pierce="4" />
 	<properties speed="80" />
-	<properties unit_specials="Active, Bleeding attack" />
+	<properties unit_specials="Bleeding attack" />
 
 	<properties display_name="Maceman" display_name_plural="Macemen" />
 	<properties icon="gameres/icons/CMaceman.bmp" />

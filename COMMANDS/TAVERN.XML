@@ -440,7 +440,7 @@
 		execdelay="30000"
 		button="Actions/CHeal.bmp"
 		param="ReqPlr, Mercenary pact, default, ReqSet, Free Trade, default, NamePlr, Mercenary heal, default"
-		description="Every time that a mercenary dies, all nearby allies are healed by 2% of his maximum health"
+		description="Every time that a mercenary dies, all nearby allies are healed by 5% of his maximum health"
 		rollover="Mercenary heal">
 		<src obj="CTavern" />
 	</cmd>

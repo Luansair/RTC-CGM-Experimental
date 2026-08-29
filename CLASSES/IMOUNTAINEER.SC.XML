@@ -4,7 +4,7 @@
 	<properties maxhealth="440" />
 	<properties damage="54" armor_slash="14" armor_pierce="14" />
 	<properties sight="600" speed="90" />
-	<properties unit_specials="Freedom, Offensive tactics, Sneak" />
+	<properties unit_specials="Freedom, Expertise, Sneak" />
 	<properties feeds="0" />
 
 	<properties display_name="Mountaineer" display_name_plural="Mountaineers" />

@@ -23,7 +23,7 @@ if (.IsValid) {
 			Obj o;
 			int i, heal;
 
-			heal = .maxhealth / 50;
+			heal = .maxhealth / 20;
 			ol = ObjsInCircle(.pos, 350, "Unit").GetObjList();
 
 			for (i = ol.count - 1; i >= 0; i -= 1) {
