@@ -8,7 +8,7 @@ Settlement setGkIn, setGkAiDest;
 Building setGkInCentralBuilding;
 point sqPos, setGkAiDestCentralBuildingPos;
 int aiPlayer, nSleepSquadMonitor, nMagePerc, nSqState, min, own, ally, enemy, enemy_hidden, i;
-bool bUseRuins, bSynchApproach, bCoward, bGoAround, bTakeItems, bValidSetGkIn, bSqLeaderIsHero, enableLogging;
+bool bUseRuins, bVisitGraves, bSynchApproach, bCoward, bGoAround, bTakeItems, bValidSetGkIn, bSqLeaderIsHero, enableLogging;
 StrArray items;
 IntArray itemStatValue, itemEffectValue, sqPrevState, sqPrevGkIn, sqPrevGkDest, sqTimerLog;
 Sleep(500 + rand(1001));
@@ -22,6 +22,7 @@ bSynchApproach = AIVar(aiPlayer, AIV_SynchApproach) != 0;
 bCoward = AIVar(aiPlayer, AIV_Coward) != 0;
 bGoAround = AIVar(aiPlayer, AIV_GoAround) != 0;
 bTakeItems = AIVar(aiPlayer, AIV_TakeItems) != 0;
+bVisitGraves = true;
 
 enableLogging = false;
 
@@ -445,6 +446,104 @@ while (true) {
 											}
 										}
 									}
+			if (bVisitGraves && bSqLeaderIsHero) {
+				int graveVisitTimer;
+
+				graveVisitTimer = EnvReadInt(aiPlayer, "GraveVisitTimer_" + sq.No);
+				if (graveVisitTimer > 0) { 
+					if (GetTime() > graveVisitTimer && nSqState == SS_Ruins) {
+						GAIKA gOrigin;
+						Building origin;
+						Settlement sOrigin, nearSh;
+						bool bValidOrigin = false;
+
+						gOrigin = GetGAIKA(EnvReadInt(aiPlayer, "GkOriginID_" + sq.No));
+						if (gOrigin.ID > 0) {
+							sOrigin = gOrigin.settlement;
+							if (sOrigin.IsValid) {
+								origin = sOrigin.GetCentralBuilding;
+								if (origin.IsValid && sOrigin.IsOwn(aiPlayer)) {
+									origin = gOrigin.settlement.GetCentralBuilding();
+									sq.SetCmd(SS_Enter, 0, SF_ADVCHOOSER, "enter", origin);
+									Sleep(100);
+									bValidOrigin = true;
+								}
+							}
+						}
+						if (!bValidOrigin) {
+							nearSh = NearestStronghold(sqPos, aiPlayer);
+							if (nearSh.IsValid) {
+								Building hall;
+								hall = nearSh.GetCentralBuilding();
+								sq.SetCmd(SS_Enter, 0, SF_ADVCHOOSER, "enter", hall);
+							} else {
+								sq.SetCmd(SS_IDLE, 0, SF_ADVCHOOSER, "wait", sqPos);
+							}
+						}
+						
+						// Clear env
+						EnvWriteInt(aiPlayer, "GraveVisitTimer_" + sq.No, 0);
+						EnvWriteInt(aiPlayer, "GkOriginID_" + sq.No, 0);
+						continue;
+					} else {
+						int x, y;
+						point gravePt;
+
+						x = EnvReadInt(aiPlayer, "GravePosX_" + sq.No);
+						y = EnvReadInt(aiPlayer, "GravePosY_" + sq.No);
+						gravePt = Point(x,y);
+						if (sq.pos.Dist(gravePt) > 400) {
+							sq.SetCmd(SS_Ruins, 0, SF_ADVCHOOSER, "move", gravePt);
+							Sleep(100);
+						} else {
+							sq.SetCmd(SS_Ruins, 0, SF_ADVCHOOSER, "wait", gravePt);
+							Sleep(100);
+						}
+					}
+				}
+				else if (sq.InHolder && bValidSetGkIn) {
+					if (setGkIn.IsStronghold && rand(3) == 0) {
+						ObjList graves;
+						Obj grave, bestGrave;
+						int i, graveLevel, bestLevel, timeLeft, distance, timeToTravel, timeToLevel, levelsToGet;  // Time are in seconds
+
+						if (nSqState == SS_Ruins)
+							sq.SetState(SS_IDLE);
+
+						graves = ObjsInCircle(sqPos, 8000, "HeroGrave").GetObjList();
+						for(i = graves.count - 1; i >= 0; i -= 1) {
+							grave = graves[i];
+							if (grave.player != aiPlayer) continue;
+							graveLevel = grave.maxstamina;
+							timeLeft = grave.health;
+							// Need enough time to arrive and farm at least 10 levels (if posible). Takes 4 sec per level
+							distance = grave.DistTo(sqPos);
+							timeToTravel = distance / sqLeader.speed;
+							if (timeLeft < timeToTravel + 10 * 4) continue;
+
+							if (graveLevel > bestLevel) {
+								bestLevel = graveLevel;
+								bestGrave = grave;
+							}
+						}
+						levelsToGet = bestLevel * 4 / 5 - sqLeader.inherentlevel;
+						if (levelsToGet >= 10) {
+							int totalTime;
+							
+							timeToLevel = levelsToGet * 4;
+							totalTime = timeToLevel + bestGrave.DistTo(sqPos) / sqLeader.speed;
+							EnvWriteInt(aiPlayer, "GraveVisitTimer_" + sq.No, GetTime() + totalTime * 1000);
+							EnvWriteInt(aiPlayer, "GkOriginID_" + sq.No, sqGkIn.ID);
+							EnvWriteInt(aiPlayer, "GravePosX_" + sq.No, bestGrave.pos.x);
+							EnvWriteInt(aiPlayer, "GravePosY_" + sq.No, bestGrave.pos.y);
+							sqLeaderHero.DetachArmy();
+							sq.SetCmd(SS_Ruins, 0, SF_ADVCHOOSER, "move", bestGrave.pos);
+							Sleep(100);
+							continue;
+						}
+					}
+				}
+			}
 			// =============================
 			// USE ITEMS
 			// =============================
@@ -535,7 +634,7 @@ while (true) {
 			// DROP ITEMS
 			// =========================
 			if (bSqLeaderIsHero &&
-				(nSqState == SS_IDLE || nSqState == SS_Enter || nSqState == SS_Ruins || nSqState == SS_Wait) &&
+				(nSqState == SS_IDLE || nSqState == SS_Enter || nSqState == SS_Wait) &&
 				sq.InHolder && bValidSetGkIn) {
 				bool bAllGoodItems;
 
@@ -638,7 +737,7 @@ while (true) {
 							sqLeader.ExitHolder(exitPt);
 							Sleep(100);
 							sqLeader.DropItem(worstItem, sqLeader.pos + offSet);
-							sqLeader.SetUser(GetTime() * 512 + nWorstScore);
+							sqLeader.SetUser(GetTime() / 1000 * 512 + nWorstScore);
 							Sleep(100);
 						}
 						// All items are good so don't try to drop ever again. 
@@ -897,14 +996,14 @@ while (true) {
 						//==============================
 						// TAKE ITEMS
 						//==============================
-						// "User" field of Unit class is used to store the time and the value of the item dropped when it drop an item to avoid picking it up again.
+						// "User" field of Unit class is used to store the time in seconds and the value of the item dropped when it drops an item to avoid picking it up again.
 
 						if (bTakeItems && sqLeader.free_item_slots > 0) {
 							int pickupTime, threshold;
 							pickupTime = sqLeader.user / 512;  // Use 9 bits for item value, the rest for gameTime.
 							threshold = pickupTime % 512;
 
-							if (GetTime() > pickupTime + 30000) {
+							if (GetTime() > pickupTime * 1000 + 30000) {
 								int j, k, holderDist, minDist, bestItemEval; 
 								ObjList itemHoldersInSight;
 								ItemHolder itemHolder, bestItemHolder;
@@ -1036,11 +1135,26 @@ while (true) {
 							sqGkIn.GetSquads(SL, AI_STAYING + AI_LEAVING, aiPlayer, AI_OWN);
 							SL.Lock();
 							for (; !SL.EOL; SL.Next()) {
+								Hero heroToAttachTo;
 								squad = SL.Cur;
+
+								heroToAttachTo = squad.Leader.AsHero();
 								if (!squad.Leader.GetFlags(UNITFLAG_NOAI) && !squad.TestFlags(SF_NOAI) && squad.State != SS_Ruins && squad.State != SS_Flee) {
-									eval = sq.EvalAttach(squad.Leader, min);  	// This squad.Leader is not the same from below (sqLeader). sq is from Main Loop, but it doesnt really matter lol.
-									if (eval > 0) {  							// Looking for a hero between the squads in this for loop
-										if (sqLeader.AsDruid().IsValid) {  		// Checking if the leader from the main loop squad is a Druid to assign to the Hero
+
+									if (!heroToAttachTo.IsValid) { 
+										if (!squad.Leader.HasFreedom && squad.Leader.IsHeirOf("Melee") && sqLeader.IsHeirOf("Melee") && squad.Eval > sq.Eval * 2) {
+											bestEval = 0;  // It found a much stronger free melee squad. Do not assign this one yet.
+											break;
+										}
+										continue;
+									} 
+									if (min == 50) min = heroToAttachTo.maxarmy;
+									eval = sq.EvalAttach(heroToAttachTo, min);  	// This squad.Leader is not the same from below (sqLeader). sq is from Main Loop, but it doesnt really matter lol.
+									if (eval > 0) {  	
+										Unit unitsToBeAttached;
+										int heroLvl;
+										heroLvl = heroToAttachTo.inherentlevel;	
+										if (sqLeader.AsDruid().IsValid) {  		    // Checking if the leader from the main loop squad is a Druid to assign to the Hero
 											int nWant;
 											nWant = squad.Size * nMagePerc / 100 - squad.Count("BaseMage");
 											if (nWant > 0)
@@ -1056,40 +1170,29 @@ while (true) {
 											else
 												continue;
 										}
-										else if (sqLeader.IsHeirOf("Melee")) {
-											int sqAvg;
-											sqAvg = sq.Eval / sq.Size;
-											if (sqAvg < eval / 2) 
-												continue;  							// Don't attach if the main loop squad is too weak compared to the squad from the for loop	
+										
+										// Unit's special and hero's skill interactions influences eval.
+										unitsToBeAttached = sqLeader.AsUnit();
+										if (unitsToBeAttached.HasSpecial(offensive_tactics)) {
+											int battleCryLvl;
+											int leadershipLvl;
+											
+											battleCryLvl = heroToAttachTo.GetSkill(hsBattleCry);
+											leadershipLvl = heroToAttachTo.GetSkill(hsLeadership);
+											eval += eval * battleCryLvl / 20 + eval * leadershipLvl / 40 + eval * heroLvl / 10; 
 										}
-										// Unit skill and hero skill interactions influences eval.
-										if (squad.Leader.AsHero().IsValid) {
-											Hero heroToAttachTo;
-											Unit unitsToBeAttached;
+										if (unitsToBeAttached.HasSpecial(triple_strike)) {
+											int assaultLvl;
+											int teamAttackLvl;
 
-											heroToAttachTo = squad.Leader.AsHero();
-											unitsToBeAttached = sqLeader.AsUnit();
-											if (unitsToBeAttached.HasSpecial(offensive_tactics)) {
-												int battleCryLvl;
-												int leadershipLvl;
-												
-												battleCryLvl = heroToAttachTo.GetSkill(hsBattleCry);
-												leadershipLvl = heroToAttachTo.GetSkill(hsLeadership);
-												eval = eval * (1 + battleCryLvl / 20 + leadershipLvl / 40); 
-											}
-											if (unitsToBeAttached.HasSpecial(triple_strike)) {
-												int assaultLvl;
-												int teamAttackLvl;
-
-												assaultLvl = heroToAttachTo.GetSkill(hsAssault);
-												teamAttackLvl = heroToAttachTo.GetSkill(hsTeamAttack);
-												eval = eval * (1 + assaultLvl / 10 + teamAttackLvl / 20);
-											}
+											assaultLvl = heroToAttachTo.GetSkill(hsAssault);
+											teamAttackLvl = heroToAttachTo.GetSkill(hsTeamAttack);
+											eval += eval * assaultLvl / 10 + eval * teamAttackLvl / 20;
 										}
 										
 										
-										if (squad.Size > 1 && squad.Count("Horse") == squad.Size - 1 && sq.Count("Horse") != sq.Size)  // Army of only horses
-											continue;  								
+										//if (squad.Size > 1 && squad.Count("Horse") == squad.Size - 1 && sq.Count("Horse") != sq.Size)  // Army of only horses
+										//	continue;  								
 										if (eval > bestEval) {
 											bestHero = squad.Leader;  				// This picks the best hero for min value
 											bestEval = eval;		  				// Save eval for future iteration
